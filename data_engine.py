@@ -36,9 +36,17 @@ def parse_offer_letter(filepath):
     equity_match = re.search(r'Equity Grant:\s*\$([\d,]+)', content)
     equity_grant = int(equity_match.group(1).replace(',', '')) if equity_match else 0
     
-    # Extract signing bonus
-    signing_bonus_match = re.search(r'Signing Bonus.*?\$([\d,]+)', content, re.DOTALL)
-    signing_bonus = int(signing_bonus_match.group(1).replace(',', '')) if signing_bonus_match else 0
+    # Extract signing bonus (scoped to the SIGNING BONUS section so that a
+    # "No signing bonus is included" note is not confused with dollar amounts
+    # from later sections such as the benefits stipends).
+    signing_bonus = 0
+    signing_section_match = re.search(
+        r'SIGNING BONUS\s*\n[\u2500\-=_]+\s*\n(.*?)(?:\n[\u2500\-=_]{3,}|\Z)',
+        content, re.DOTALL | re.IGNORECASE)
+    if signing_section_match:
+        amount_match = re.search(r'\$([\d,]+)', signing_section_match.group(1))
+        if amount_match:
+            signing_bonus = int(amount_match.group(1).replace(',', ''))
     
     # Extract start date
     start_date_match = re.search(r'Start Date:\s*(.+?)(?:\n|$)', content)
