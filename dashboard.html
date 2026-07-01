@@ -3,11 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biz Ops Monitoring System - Cognition</title>
+    <title>People Ops Command Center — Cognition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #f7f6f5;
+            --surface: #ffffff;
+            --surface-2: #efeee9;
+            --border: #e4e2dc;
+            --text: #0a0a0a;
+            --text-muted: #626870;
+            --accent: #2200ff;
+            --accent-hover: #1a00cc;
+            --ok: #1a7f37;
+            --warning: #b45309;
+            --critical: #d92d20;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +31,9 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f1115;
-            color: #e2e8f0;
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             min-height: 100vh;
         }
@@ -25,8 +41,8 @@
         /* Sidebar Navigation */
         .sidebar {
             width: 260px;
-            background-color: #161b22;
-            border-right: 1px solid #30363d;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
             padding: 24px 16px;
             position: fixed;
             height: 100vh;
@@ -34,11 +50,29 @@
         }
 
         .logo {
-            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
             font-weight: 700;
-            color: #58a6ff;
+            letter-spacing: -0.02em;
+            color: var(--text);
             margin-bottom: 32px;
             padding: 0 12px;
+        }
+
+        .logo-mark {
+            width: 22px;
+            height: 22px;
+            color: var(--accent);
+            flex-shrink: 0;
+            display: inline-flex;
+        }
+
+        .logo-mark svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .nav-item {
@@ -46,7 +80,7 @@
             padding: 12px 16px;
             margin-bottom: 4px;
             border-radius: 6px;
-            color: #8b949e;
+            color: var(--text-muted);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -55,12 +89,12 @@
         }
 
         .nav-item:hover {
-            background-color: #21262d;
-            color: #e2e8f0;
+            background-color: var(--surface-2);
+            color: var(--text);
         }
 
         .nav-item.active {
-            background-color: #1f6feb;
+            background-color: var(--accent);
             color: #ffffff;
         }
 
@@ -87,13 +121,14 @@
         .page-title {
             font-size: 28px;
             font-weight: 700;
-            color: #f0f6fc;
+            color: var(--text);
             margin-bottom: 8px;
         }
 
         .page-subtitle {
-            font-size: 14px;
-            color: #8b949e;
+            font-family: var(--font-serif);
+            font-size: 15px;
+            color: var(--text-muted);
         }
 
         /* KPI Cards */
@@ -105,8 +140,8 @@
         }
 
         .kpi-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 20px;
         }
@@ -114,7 +149,7 @@
         .kpi-label {
             font-size: 12px;
             font-weight: 500;
-            color: #8b949e;
+            color: var(--text-muted);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -123,27 +158,27 @@
         .kpi-value {
             font-size: 32px;
             font-weight: 700;
-            color: #f0f6fc;
+            color: var(--text);
             margin-bottom: 4px;
         }
 
         .kpi-value.warning {
-            color: #d29922;
+            color: var(--warning);
         }
 
         .kpi-value.critical {
-            color: #f85149;
+            color: var(--critical);
         }
 
         .kpi-subtitle {
             font-size: 12px;
-            color: #8b949e;
+            color: var(--text-muted);
         }
 
         /* Tables */
         .table-container {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 24px;
@@ -151,7 +186,7 @@
 
         .table-header {
             padding: 16px 20px;
-            border-bottom: 1px solid #30363d;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -160,7 +195,7 @@
         .table-title {
             font-size: 16px;
             font-weight: 600;
-            color: #f0f6fc;
+            color: var(--text);
         }
 
         .table-filters {
@@ -169,11 +204,11 @@
         }
 
         .filter-select {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 6px;
             padding: 6px 12px;
-            color: #e2e8f0;
+            color: var(--text);
             font-size: 12px;
             cursor: pointer;
         }
@@ -184,22 +219,22 @@
         }
 
         th {
-            background-color: #161b22;
-            border-bottom: 1px solid #30363d;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
             padding: 12px 16px;
             text-align: left;
             font-size: 12px;
             font-weight: 600;
-            color: #8b949e;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         td {
             padding: 12px 16px;
-            border-bottom: 1px solid #21262d;
+            border-bottom: 1px solid var(--surface-2);
             font-size: 13px;
-            color: #e2e8f0;
+            color: var(--text);
         }
 
         tr:last-child td {
@@ -207,7 +242,7 @@
         }
 
         tr:hover {
-            background-color: #21262d;
+            background-color: var(--surface-2);
         }
 
         /* Status Badges */
@@ -221,44 +256,44 @@
         }
 
         .badge.ok {
-            background-color: #238636;
+            background-color: var(--ok);
             color: #ffffff;
         }
 
         .badge.warning {
-            background-color: #d29922;
+            background-color: var(--warning);
             color: #ffffff;
         }
 
         .badge.critical {
-            background-color: #f85149;
+            background-color: var(--critical);
             color: #ffffff;
         }
 
         .badge.medium {
-            background-color: #d29922;
+            background-color: var(--warning);
             color: #ffffff;
         }
 
         .badge.low {
-            background-color: #238636;
+            background-color: var(--ok);
             color: #ffffff;
         }
 
         .badge.matched {
-            background-color: #238636;
+            background-color: var(--ok);
             color: #ffffff;
         }
 
         .badge.mismatched {
-            background-color: #f85149;
+            background-color: var(--critical);
             color: #ffffff;
         }
 
         /* Horizontal Bar Charts */
         .chart-container {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 24px;
@@ -267,7 +302,7 @@
         .chart-title {
             font-size: 16px;
             font-weight: 600;
-            color: #f0f6fc;
+            color: var(--text);
             margin-bottom: 16px;
         }
 
@@ -286,7 +321,7 @@
         .bar-label {
             width: 150px;
             font-size: 13px;
-            color: #e2e8f0;
+            color: var(--text);
             text-align: right;
             flex-shrink: 0;
         }
@@ -294,7 +329,7 @@
         .bar-track {
             flex: 1;
             height: 24px;
-            background-color: #21262d;
+            background-color: var(--surface-2);
             border-radius: 4px;
             overflow: hidden;
             position: relative;
@@ -302,17 +337,17 @@
 
         .bar-fill {
             height: 100%;
-            background-color: #1f6feb;
+            background-color: var(--accent);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
 
         .bar-fill.warning {
-            background-color: #d29922;
+            background-color: var(--warning);
         }
 
         .bar-fill.critical {
-            background-color: #f85149;
+            background-color: var(--critical);
         }
 
         .bar-value {
@@ -322,7 +357,7 @@
             transform: translateY(-50%);
             font-size: 12px;
             font-weight: 600;
-            color: #f0f6fc;
+            color: var(--text);
             z-index: 1;
         }
 
@@ -339,23 +374,23 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 20px;
-            background-color: #21262d;
+            background-color: var(--surface-2);
             border-radius: 6px;
             width: 100%;
             max-width: 600px;
-            border-left: 4px solid #1f6feb;
+            border-left: 4px solid var(--accent);
         }
 
         .funnel-stage-name {
             font-size: 14px;
             font-weight: 500;
-            color: #e2e8f0;
+            color: var(--text);
         }
 
         .funnel-stage-count {
             font-size: 18px;
             font-weight: 700;
-            color: #f0f6fc;
+            color: var(--text);
         }
 
         /* Two Column Layout */
@@ -371,8 +406,8 @@
         }
 
         .assumptions-section {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
@@ -381,13 +416,14 @@
         .section-title {
             font-size: 18px;
             font-weight: 600;
-            color: #f0f6fc;
+            color: var(--text);
             margin-bottom: 8px;
         }
 
         .section-subtitle {
-            font-size: 13px;
-            color: #8b949e;
+            font-family: var(--font-serif);
+            font-size: 14px;
+            color: var(--text-muted);
             margin-bottom: 20px;
         }
 
@@ -406,23 +442,23 @@
         .form-label {
             font-size: 13px;
             font-weight: 500;
-            color: #e2e8f0;
+            color: var(--text);
         }
 
         .form-input {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 6px;
             padding: 10px 12px;
-            color: #e2e8f0;
+            color: var(--text);
             font-size: 14px;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-sans);
             transition: border-color 0.2s;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #1f6feb;
+            border-color: var(--accent);
         }
 
         .assumptions-actions {
@@ -436,29 +472,29 @@
             border-radius: 6px;
             font-size: 14px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-sans);
             cursor: pointer;
             border: none;
             transition: all 0.2s;
         }
 
         .btn-primary {
-            background-color: #1f6feb;
+            background-color: var(--accent);
             color: #ffffff;
         }
 
         .btn-primary:hover {
-            background-color: #388bfd;
+            background-color: var(--accent-hover);
         }
 
         .btn-secondary {
-            background-color: #21262d;
-            color: #e2e8f0;
-            border: 1px solid #30363d;
+            background-color: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background-color: #30363d;
+            background-color: var(--border);
         }
 
         /* Responsive */
@@ -501,7 +537,7 @@
 <body>
     <!-- Sidebar Navigation -->
     <nav class="sidebar">
-        <div class="logo">Cognition</div>
+        <div class="logo"><span class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" ><defs><clipPath id="__lottie_element_2"><rect width="100%" height="100%" x="0" y="0"></rect></clipPath></defs><g clip-path="url(#__lottie_element_2)"><g transform="matrix(1,0,0,1,143.46,330.57)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.08,38.54)"><path fill="currentColor" fill-opacity="1" d=" M-38.83,11.4 C-29.32,5.93 -17.92,6.25 -8.41,11.72 C1.05,17.19 6.96,27.33 6.96,38.29 C6.96,38.29 38.83,-14.38 38.83,-14.38 C29.36,-8.91 15.91,-8.54 6.45,-14.01 C-2.42,-19.11 -8.15,-28.17 -8.88,-38.29 C-8.88,-38.29 -38.83,11.4 -38.83,11.4z"></path></g></g><g transform="matrix(1,0,0,1,143.23,90.99)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.16,38.68)"><path fill="currentColor" fill-opacity="1" d=" M-38.91,-11.66 C-29.41,-6.19 -17.77,-6.35 -8.27,-11.82 C1.19,-17.29 7.15,-27.48 7.15,-38.43 C7.15,-38.43 38.91,14.71 38.91,14.71 C29.45,9.24 16.06,8.44 6.59,13.9 C-2.28,19.01 -8.01,28.32 -8.74,38.43 C-8.74,38.43 -38.91,-11.66 -38.91,-11.66z"></path></g></g><g transform="matrix(1,0,0,1,280.3,251.87)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.82,38.54)"><path fill="currentColor" fill-opacity="1" d=" M-39.57,11.4 C-30.07,5.93 -18.66,6.25 -9.16,11.72 C0.31,17.19 6.28,27.33 6.28,38.29 C6.28,38.29 39.57,-15.82 39.57,-15.82 C30.11,-10.35 15.17,-8.54 5.7,-14.01 C-3.16,-19.11 -8.9,-28.17 -9.62,-38.29 C-9.62,-38.29 -39.57,11.4 -39.57,11.4z"></path></g></g><g transform="matrix(1,0,0,1,280.09,170.34)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.16,38.68)"><path fill="currentColor" fill-opacity="1" d=" M-38.91,-11.65 C-29.4,-6.18 -17.78,-6.35 -8.27,-11.82 C1.19,-17.29 7.14,-27.48 7.14,-38.43 C7.14,-38.43 38.91,14.31 38.91,14.31 C29.44,8.85 16.05,8.44 6.59,13.91 C-2.28,19.01 -8.01,28.32 -8.74,38.43 C-8.74,38.43 -38.91,-11.65 -38.91,-11.65z"></path></g></g><g transform="matrix(1,0,0,1,326.09,260.4)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.3)"><path fill="currentColor" fill-opacity="1" d=" M60.49,-28.31 C60.49,-29.37 60.35,-30.41 60.08,-31.41 C60,-31.7 59.89,-31.99 59.79,-32.27 C59.74,-32.42 59.69,-32.56 59.64,-32.71 C58.7,-34.98 57.03,-36.92 54.83,-38.17 C54.83,-38.17 5.73,-66.58 5.73,-66.58 C5.73,-66.58 5.56,-66.64 5.49,-66.68 C4.71,-67.09 3.92,-67.44 3.07,-67.68 C2.94,-67.71 2.83,-67.71 2.7,-67.75 C1.91,-67.95 1.09,-68.05 0.31,-68.05 C0.31,-68.05 -0.07,-68.05 -0.07,-68.05 C-0.92,-68.05 -1.77,-67.92 -2.63,-67.71 C-2.8,-67.67 -2.98,-67.6 -3.14,-67.57 C-3.99,-67.33 -4.81,-66.99 -5.64,-66.55 C-5.64,-66.55 -30.2,-52.35 -30.2,-52.35 C-31.63,-51.52 -33.11,-50.84 -34.63,-50.26 C-34.63,-50.26 -54.52,-38.84 -54.52,-38.84 C-58.22,-36.71 -60.5,-32.78 -60.5,-28.51 C-60.5,-28.51 -60.51,-2.03 -60.51,-2.03 C-60.46,-1.35 -60.44,-0.68 -60.44,-0 C-60.44,-0 -60.44,28.4 -60.44,28.4 C-60.44,28.7 -60.41,29 -60.38,29.29 C-59.85,32.85 -57.74,36.03 -54.56,37.86 C-54.56,37.86 -5.95,65.93 -5.95,65.93 C-2.28,68.05 2.25,68.05 5.93,65.94 C5.93,65.94 54.52,38.05 54.52,38.05 C58.23,35.93 60.51,31.98 60.51,27.72 C60.51,27.72 60.51,27.52 60.51,27.52 C60.51,27.52 60.49,-28.31 60.49,-28.31z"></path></g></g><g transform="matrix(1,0,0,1,189.24,180.89)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.7)"><path fill="currentColor" fill-opacity="1" d=" M54.54,-38.22 C54.54,-38.22 5.95,-66.32 5.95,-66.32 C2.28,-68.45 -2.26,-68.45 -5.94,-66.34 C-5.94,-66.34 -54.51,-38.44 -54.51,-38.44 C-58.21,-36.31 -60.49,-32.38 -60.49,-28.11 C-60.49,-28.11 -60.51,27.94 -60.51,27.94 C-60.51,32.2 -58.24,36.13 -54.56,38.26 C-54.56,38.26 -5.95,66.32 -5.95,66.32 C-2.27,68.45 2.26,68.45 5.94,66.34 C5.94,66.34 54.53,38.45 54.53,38.45 C58.23,36.33 60.51,32.38 60.51,28.11 C60.51,28.11 60.49,-27.91 60.49,-27.91 C60.49,-32.17 58.23,-36.09 54.54,-38.22z"></path></g></g><g transform="matrix(1,0,0,1,326.08,101.98)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.44)"><path fill="currentColor" fill-opacity="1" d=" M-54.55,37.99 C-54.55,37.99 -5.94,66.06 -5.94,66.06 C-2.27,68.18 2.26,68.19 5.94,66.07 C5.94,66.07 54.54,38.18 54.54,38.18 C58.18,36.09 60.44,32.24 60.51,28.05 C60.51,28.05 60.51,-14.03 60.51,-14.03 C60.51,-14.03 60.5,-28.18 60.5,-28.18 C60.5,-31.84 58.82,-35.25 56,-37.49 C55.63,-37.77 55.24,-38.03 54.83,-38.27 C54.83,-38.27 5.73,-66.67 5.73,-66.67 C4.85,-67.17 3.92,-67.55 2.97,-67.8 C2.75,-67.86 2.52,-67.89 2.3,-67.94 C2.04,-67.99 1.79,-68.05 1.54,-68.09 C1.04,-68.15 0.53,-68.18 0.03,-68.18 C-1.93,-68.18 -3.89,-67.68 -5.65,-66.67 C-5.65,-66.67 -54.75,-38.27 -54.75,-38.27 C-54.75,-38.27 -54.88,-38.16 -54.95,-38.13 C-55.7,-37.69 -56.43,-37.13 -57.04,-36.52 C-57.15,-36.42 -57.21,-36.32 -57.32,-36.22 C-57.86,-35.63 -58.34,-34.98 -58.78,-34.3 C-58.85,-34.19 -58.91,-34.1 -58.98,-33.95 C-59.39,-33.19 -59.74,-32.41 -59.98,-31.56 C-60.04,-31.39 -60.08,-31.21 -60.11,-31.01 C-60.31,-30.16 -60.46,-29.27 -60.46,-28.34 C-60.46,-28.34 -60.46,0.06 -60.46,0.06 C-60.46,0.49 -60.48,0.91 -60.5,1.34 C-60.5,1.34 -60.51,27.67 -60.51,27.67 C-60.51,31.93 -58.24,35.87 -54.55,37.99z"></path></g></g><g transform="matrix(1,0,0,1,189.24,22.49)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.7)"><path fill="currentColor" fill-opacity="1" d=" M-54.56,38.26 C-54.56,38.26 -5.95,66.32 -5.95,66.32 C-2.27,68.45 2.25,68.45 5.94,66.34 C5.94,66.34 54.53,38.45 54.53,38.45 C58.23,36.33 60.51,32.38 60.51,28.11 C60.51,28.11 60.49,-27.91 60.49,-27.91 C60.49,-32.17 58.23,-36.1 54.54,-38.22 C54.54,-38.22 5.95,-66.32 5.95,-66.32 C2.28,-68.45 -2.26,-68.45 -5.94,-66.34 C-5.94,-66.34 -32.37,-51.16 -32.37,-51.16 C-32.37,-51.16 -54.74,-38.22 -54.74,-38.22 C-54.74,-38.22 -54.88,-38.11 -54.94,-38.08 C-55.69,-37.64 -56.41,-37.08 -57.03,-36.47 C-57.14,-36.37 -57.21,-36.27 -57.31,-36.17 C-57.79,-35.65 -58.21,-35.08 -58.62,-34.49 C-58.88,-34.08 -59.11,-33.65 -59.32,-33.21 C-59.58,-32.66 -59.82,-32.1 -59.98,-31.51 C-60.05,-31.33 -60.09,-31.16 -60.12,-30.96 C-60.33,-30.11 -60.46,-29.22 -60.46,-28.29 C-60.46,-28.29 -60.46,0.12 -60.46,0.12 C-60.46,0.56 -60.49,1 -60.5,1.44 C-60.5,1.44 -60.51,27.94 -60.51,27.94 C-60.51,32.2 -58.24,36.13 -54.56,38.26z"></path></g></g><g transform="matrix(1,0,0,1,52.39,102.02)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.42)"><path fill="currentColor" fill-opacity="1" d=" M-54.55,37.97 C-54.55,37.97 -5.94,66.04 -5.94,66.04 C-2.27,68.16 2.26,68.17 5.94,66.05 C5.94,66.05 54.53,38.16 54.53,38.16 C57.28,36.59 59.24,34.01 60.07,31.03 C60.08,31.02 60.08,31.01 60.08,31 C60.28,30.15 60.43,29.26 60.43,28.34 C60.43,28.34 60.43,-0.06 60.43,-0.06 C60.43,-0.79 60.46,-1.52 60.51,-2.24 C60.51,-2.24 60.5,-28.2 60.5,-28.2 C60.5,-32.45 58.23,-36.38 54.55,-38.51 C54.55,-38.51 32.17,-51.45 32.17,-51.45 C31.52,-51.76 30.88,-52.1 30.25,-52.46 C30.25,-52.46 5.69,-66.66 5.69,-66.66 C4.9,-67.1 4.05,-67.45 3.19,-67.69 C3.02,-67.75 2.85,-67.79 2.64,-67.82 C1.79,-68.02 0.93,-68.13 0.08,-68.17 C0.08,-68.17 -0.29,-68.17 -0.29,-68.17 C-1.12,-68.17 -1.9,-68.03 -2.69,-67.86 C-2.82,-67.86 -2.96,-67.82 -3.06,-67.79 C-3.91,-67.55 -4.69,-67.21 -5.49,-66.79 C-5.56,-66.75 -5.66,-66.73 -5.73,-66.69 C-5.73,-66.69 -54.83,-38.29 -54.83,-38.29 C-57.01,-37.03 -58.66,-35.12 -59.61,-32.88 C-60.18,-31.48 -60.49,-29.96 -60.49,-28.4 C-60.49,-28.4 -60.51,27.65 -60.51,27.65 C-60.51,31.91 -58.24,35.85 -54.55,37.97z"></path></g></g><g transform="matrix(1,0,0,1,189.24,339.33)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.72,68.44)"><path fill="currentColor" fill-opacity="1" d=" M54.79,38.24 C58.31,36.22 60.47,32.47 60.47,28.39 C60.47,28.39 60.47,-28.4 60.47,-28.4 C60.47,-28.74 60.43,-29.07 60.4,-29.4 C59.87,-32.96 57.76,-36.12 54.59,-37.96 C54.59,-37.96 6,-66.05 6,-66.05 C2.32,-68.18 -2.21,-68.19 -5.9,-66.07 C-5.9,-66.07 -54.47,-38.17 -54.47,-38.17 C-58.17,-36.05 -60.45,-32.11 -60.45,-27.84 C-60.45,-27.84 -60.47,28.21 -60.47,28.21 C-60.47,30.29 -59.92,32.3 -58.93,34.05 C-58.9,34.1 -58.87,34.16 -58.83,34.22 C-58.68,34.48 -58.51,34.72 -58.34,34.97 C-58.04,35.39 -57.71,35.81 -57.33,36.19 C-57.22,36.3 -57.16,36.39 -57.06,36.5 C-56.45,37.11 -55.74,37.63 -54.98,38.11 C-54.91,38.15 -54.85,38.22 -54.76,38.24 C-54.76,38.24 -5.66,66.64 -5.66,66.64 C-4.36,67.41 -2.92,67.89 -1.46,68.09 C-0.97,68.15 -0.47,68.18 0.03,68.19 C1.98,68.18 3.95,67.67 5.69,66.64 C5.69,66.64 54.79,38.24 54.79,38.24z"></path></g></g><g transform="matrix(1,0,0,1,52.39,260.13)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.43)"><path fill="currentColor" fill-opacity="1" d=" M-60.51,27.67 C-60.51,31.93 -58.24,35.87 -54.56,37.99 C-54.56,37.99 -5.95,66.06 -5.95,66.06 C-2.27,68.18 2.26,68.18 5.94,66.07 C5.94,66.07 54.53,38.18 54.53,38.18 C58.23,36.06 60.51,32.12 60.51,27.85 C60.51,27.85 60.51,2.25 60.51,2.25 C60.45,1.53 60.42,0.8 60.42,0.06 C60.42,0.06 60.42,-28.34 60.42,-28.34 C60.42,-29.26 60.29,-30.15 60.08,-31.01 C60.05,-31.19 60.01,-31.39 59.94,-31.56 C59.7,-32.38 59.36,-33.2 58.95,-33.96 C58.88,-34.06 58.81,-34.16 58.75,-34.3 C58.33,-34.98 57.86,-35.63 57.27,-36.22 C57.17,-36.32 57.1,-36.42 57.01,-36.52 C56.39,-37.14 55.68,-37.66 54.92,-38.13 C54.85,-38.17 54.79,-38.24 54.72,-38.27 C54.72,-38.27 5.62,-66.67 5.62,-66.67 C3.87,-67.68 1.92,-68.18 -0.03,-68.18 C-1.04,-68.18 -2.04,-68.06 -3.02,-67.8 C-3.97,-67.55 -4.89,-67.17 -5.76,-66.67 C-5.76,-66.67 -54.86,-38.27 -54.86,-38.27 C-56.59,-37.28 -57.99,-35.86 -58.96,-34.2 C-59.94,-32.45 -60.49,-30.46 -60.49,-28.38 C-60.49,-28.38 -60.51,27.67 -60.51,27.67z"></path></g></g></g></svg></span><span>Cognition</span></div>
         <a class="nav-item active" onclick="showPage('overview')">Overview</a>
         <a class="nav-item" onclick="showPage('assumptions')">Assumptions</a>
         <a class="nav-item" onclick="showPage('pipeline-health')">Pipeline Health</a>
