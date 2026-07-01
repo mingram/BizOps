@@ -1,0 +1,3634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Ops Command Center — Cognition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f6f5;
+            --surface: #ffffff;
+            --surface-2: #efeee9;
+            --border: #e4e2dc;
+            --text: #0a0a0a;
+            --text-muted: #626870;
+            --accent: #2200ff;
+            --accent-hover: #1a00cc;
+            --ok: #1a7f37;
+            --warning: #b45309;
+            --critical: #d92d20;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 32px;
+            padding: 0 12px;
+        }
+
+        .logo-mark {
+            width: 22px;
+            height: 22px;
+            color: var(--accent);
+            flex-shrink: 0;
+            display: inline-flex;
+        }
+
+        .logo-mark svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background-color: var(--surface-2);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background-color: var(--accent);
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 32px;
+            max-width: calc(100% - 260px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-family: var(--font-serif);
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .kpi-value.warning {
+            color: var(--warning);
+        }
+
+        .kpi-value.critical {
+            color: var(--critical);
+        }
+
+        .kpi-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-select {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--surface-2);
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: var(--surface-2);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.ok {
+            background-color: var(--ok);
+            color: #ffffff;
+        }
+
+        .badge.warning {
+            background-color: var(--warning);
+            color: #ffffff;
+        }
+
+        .badge.critical {
+            background-color: var(--critical);
+            color: #ffffff;
+        }
+
+        .badge.medium {
+            background-color: var(--warning);
+            color: #ffffff;
+        }
+
+        .badge.low {
+            background-color: var(--ok);
+            color: #ffffff;
+        }
+
+        .badge.matched {
+            background-color: var(--ok);
+            color: #ffffff;
+        }
+
+        .badge.mismatched {
+            background-color: var(--critical);
+            color: #ffffff;
+        }
+
+        /* Horizontal Bar Charts */
+        .chart-container {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar-label {
+            width: 150px;
+            font-size: 13px;
+            color: var(--text);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 24px;
+            background-color: var(--surface-2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background-color: var(--accent);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .bar-fill.warning {
+            background-color: var(--warning);
+        }
+
+        .bar-fill.critical {
+            background-color: var(--critical);
+        }
+
+        .bar-value {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 1;
+        }
+
+        /* Funnel Chart */
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background-color: var(--surface-2);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 600px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .funnel-stage-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .funnel-stage-count {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Assumptions Page Styles */
+        .assumptions-container {
+            max-width: 900px;
+        }
+
+        .assumptions-section {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            font-family: var(--font-serif);
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: var(--font-sans);
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .assumptions-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                padding: 16px 8px;
+            }
+
+            .logo {
+                font-size: 12px;
+                margin-bottom: 24px;
+                text-align: center;
+            }
+
+            .nav-item {
+                padding: 12px 8px;
+                font-size: 10px;
+                text-align: center;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                padding: 16px;
+                max-width: calc(100% - 60px);
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo"><span class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" ><defs><clipPath id="__lottie_element_2"><rect width="100%" height="100%" x="0" y="0"></rect></clipPath></defs><g clip-path="url(#__lottie_element_2)"><g transform="matrix(1,0,0,1,143.46,330.57)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.08,38.54)"><path fill="currentColor" fill-opacity="1" d=" M-38.83,11.4 C-29.32,5.93 -17.92,6.25 -8.41,11.72 C1.05,17.19 6.96,27.33 6.96,38.29 C6.96,38.29 38.83,-14.38 38.83,-14.38 C29.36,-8.91 15.91,-8.54 6.45,-14.01 C-2.42,-19.11 -8.15,-28.17 -8.88,-38.29 C-8.88,-38.29 -38.83,11.4 -38.83,11.4z"></path></g></g><g transform="matrix(1,0,0,1,143.23,90.99)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.16,38.68)"><path fill="currentColor" fill-opacity="1" d=" M-38.91,-11.66 C-29.41,-6.19 -17.77,-6.35 -8.27,-11.82 C1.19,-17.29 7.15,-27.48 7.15,-38.43 C7.15,-38.43 38.91,14.71 38.91,14.71 C29.45,9.24 16.06,8.44 6.59,13.9 C-2.28,19.01 -8.01,28.32 -8.74,38.43 C-8.74,38.43 -38.91,-11.66 -38.91,-11.66z"></path></g></g><g transform="matrix(1,0,0,1,280.3,251.87)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.82,38.54)"><path fill="currentColor" fill-opacity="1" d=" M-39.57,11.4 C-30.07,5.93 -18.66,6.25 -9.16,11.72 C0.31,17.19 6.28,27.33 6.28,38.29 C6.28,38.29 39.57,-15.82 39.57,-15.82 C30.11,-10.35 15.17,-8.54 5.7,-14.01 C-3.16,-19.11 -8.9,-28.17 -9.62,-38.29 C-9.62,-38.29 -39.57,11.4 -39.57,11.4z"></path></g></g><g transform="matrix(1,0,0,1,280.09,170.34)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,39.16,38.68)"><path fill="currentColor" fill-opacity="1" d=" M-38.91,-11.65 C-29.4,-6.18 -17.78,-6.35 -8.27,-11.82 C1.19,-17.29 7.14,-27.48 7.14,-38.43 C7.14,-38.43 38.91,14.31 38.91,14.31 C29.44,8.85 16.05,8.44 6.59,13.91 C-2.28,19.01 -8.01,28.32 -8.74,38.43 C-8.74,38.43 -38.91,-11.65 -38.91,-11.65z"></path></g></g><g transform="matrix(1,0,0,1,326.09,260.4)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.3)"><path fill="currentColor" fill-opacity="1" d=" M60.49,-28.31 C60.49,-29.37 60.35,-30.41 60.08,-31.41 C60,-31.7 59.89,-31.99 59.79,-32.27 C59.74,-32.42 59.69,-32.56 59.64,-32.71 C58.7,-34.98 57.03,-36.92 54.83,-38.17 C54.83,-38.17 5.73,-66.58 5.73,-66.58 C5.73,-66.58 5.56,-66.64 5.49,-66.68 C4.71,-67.09 3.92,-67.44 3.07,-67.68 C2.94,-67.71 2.83,-67.71 2.7,-67.75 C1.91,-67.95 1.09,-68.05 0.31,-68.05 C0.31,-68.05 -0.07,-68.05 -0.07,-68.05 C-0.92,-68.05 -1.77,-67.92 -2.63,-67.71 C-2.8,-67.67 -2.98,-67.6 -3.14,-67.57 C-3.99,-67.33 -4.81,-66.99 -5.64,-66.55 C-5.64,-66.55 -30.2,-52.35 -30.2,-52.35 C-31.63,-51.52 -33.11,-50.84 -34.63,-50.26 C-34.63,-50.26 -54.52,-38.84 -54.52,-38.84 C-58.22,-36.71 -60.5,-32.78 -60.5,-28.51 C-60.5,-28.51 -60.51,-2.03 -60.51,-2.03 C-60.46,-1.35 -60.44,-0.68 -60.44,-0 C-60.44,-0 -60.44,28.4 -60.44,28.4 C-60.44,28.7 -60.41,29 -60.38,29.29 C-59.85,32.85 -57.74,36.03 -54.56,37.86 C-54.56,37.86 -5.95,65.93 -5.95,65.93 C-2.28,68.05 2.25,68.05 5.93,65.94 C5.93,65.94 54.52,38.05 54.52,38.05 C58.23,35.93 60.51,31.98 60.51,27.72 C60.51,27.72 60.51,27.52 60.51,27.52 C60.51,27.52 60.49,-28.31 60.49,-28.31z"></path></g></g><g transform="matrix(1,0,0,1,189.24,180.89)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.7)"><path fill="currentColor" fill-opacity="1" d=" M54.54,-38.22 C54.54,-38.22 5.95,-66.32 5.95,-66.32 C2.28,-68.45 -2.26,-68.45 -5.94,-66.34 C-5.94,-66.34 -54.51,-38.44 -54.51,-38.44 C-58.21,-36.31 -60.49,-32.38 -60.49,-28.11 C-60.49,-28.11 -60.51,27.94 -60.51,27.94 C-60.51,32.2 -58.24,36.13 -54.56,38.26 C-54.56,38.26 -5.95,66.32 -5.95,66.32 C-2.27,68.45 2.26,68.45 5.94,66.34 C5.94,66.34 54.53,38.45 54.53,38.45 C58.23,36.33 60.51,32.38 60.51,28.11 C60.51,28.11 60.49,-27.91 60.49,-27.91 C60.49,-32.17 58.23,-36.09 54.54,-38.22z"></path></g></g><g transform="matrix(1,0,0,1,326.08,101.98)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.44)"><path fill="currentColor" fill-opacity="1" d=" M-54.55,37.99 C-54.55,37.99 -5.94,66.06 -5.94,66.06 C-2.27,68.18 2.26,68.19 5.94,66.07 C5.94,66.07 54.54,38.18 54.54,38.18 C58.18,36.09 60.44,32.24 60.51,28.05 C60.51,28.05 60.51,-14.03 60.51,-14.03 C60.51,-14.03 60.5,-28.18 60.5,-28.18 C60.5,-31.84 58.82,-35.25 56,-37.49 C55.63,-37.77 55.24,-38.03 54.83,-38.27 C54.83,-38.27 5.73,-66.67 5.73,-66.67 C4.85,-67.17 3.92,-67.55 2.97,-67.8 C2.75,-67.86 2.52,-67.89 2.3,-67.94 C2.04,-67.99 1.79,-68.05 1.54,-68.09 C1.04,-68.15 0.53,-68.18 0.03,-68.18 C-1.93,-68.18 -3.89,-67.68 -5.65,-66.67 C-5.65,-66.67 -54.75,-38.27 -54.75,-38.27 C-54.75,-38.27 -54.88,-38.16 -54.95,-38.13 C-55.7,-37.69 -56.43,-37.13 -57.04,-36.52 C-57.15,-36.42 -57.21,-36.32 -57.32,-36.22 C-57.86,-35.63 -58.34,-34.98 -58.78,-34.3 C-58.85,-34.19 -58.91,-34.1 -58.98,-33.95 C-59.39,-33.19 -59.74,-32.41 -59.98,-31.56 C-60.04,-31.39 -60.08,-31.21 -60.11,-31.01 C-60.31,-30.16 -60.46,-29.27 -60.46,-28.34 C-60.46,-28.34 -60.46,0.06 -60.46,0.06 C-60.46,0.49 -60.48,0.91 -60.5,1.34 C-60.5,1.34 -60.51,27.67 -60.51,27.67 C-60.51,31.93 -58.24,35.87 -54.55,37.99z"></path></g></g><g transform="matrix(1,0,0,1,189.24,22.49)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.7)"><path fill="currentColor" fill-opacity="1" d=" M-54.56,38.26 C-54.56,38.26 -5.95,66.32 -5.95,66.32 C-2.27,68.45 2.25,68.45 5.94,66.34 C5.94,66.34 54.53,38.45 54.53,38.45 C58.23,36.33 60.51,32.38 60.51,28.11 C60.51,28.11 60.49,-27.91 60.49,-27.91 C60.49,-32.17 58.23,-36.1 54.54,-38.22 C54.54,-38.22 5.95,-66.32 5.95,-66.32 C2.28,-68.45 -2.26,-68.45 -5.94,-66.34 C-5.94,-66.34 -32.37,-51.16 -32.37,-51.16 C-32.37,-51.16 -54.74,-38.22 -54.74,-38.22 C-54.74,-38.22 -54.88,-38.11 -54.94,-38.08 C-55.69,-37.64 -56.41,-37.08 -57.03,-36.47 C-57.14,-36.37 -57.21,-36.27 -57.31,-36.17 C-57.79,-35.65 -58.21,-35.08 -58.62,-34.49 C-58.88,-34.08 -59.11,-33.65 -59.32,-33.21 C-59.58,-32.66 -59.82,-32.1 -59.98,-31.51 C-60.05,-31.33 -60.09,-31.16 -60.12,-30.96 C-60.33,-30.11 -60.46,-29.22 -60.46,-28.29 C-60.46,-28.29 -60.46,0.12 -60.46,0.12 C-60.46,0.56 -60.49,1 -60.5,1.44 C-60.5,1.44 -60.51,27.94 -60.51,27.94 C-60.51,32.2 -58.24,36.13 -54.56,38.26z"></path></g></g><g transform="matrix(1,0,0,1,52.39,102.02)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.42)"><path fill="currentColor" fill-opacity="1" d=" M-54.55,37.97 C-54.55,37.97 -5.94,66.04 -5.94,66.04 C-2.27,68.16 2.26,68.17 5.94,66.05 C5.94,66.05 54.53,38.16 54.53,38.16 C57.28,36.59 59.24,34.01 60.07,31.03 C60.08,31.02 60.08,31.01 60.08,31 C60.28,30.15 60.43,29.26 60.43,28.34 C60.43,28.34 60.43,-0.06 60.43,-0.06 C60.43,-0.79 60.46,-1.52 60.51,-2.24 C60.51,-2.24 60.5,-28.2 60.5,-28.2 C60.5,-32.45 58.23,-36.38 54.55,-38.51 C54.55,-38.51 32.17,-51.45 32.17,-51.45 C31.52,-51.76 30.88,-52.1 30.25,-52.46 C30.25,-52.46 5.69,-66.66 5.69,-66.66 C4.9,-67.1 4.05,-67.45 3.19,-67.69 C3.02,-67.75 2.85,-67.79 2.64,-67.82 C1.79,-68.02 0.93,-68.13 0.08,-68.17 C0.08,-68.17 -0.29,-68.17 -0.29,-68.17 C-1.12,-68.17 -1.9,-68.03 -2.69,-67.86 C-2.82,-67.86 -2.96,-67.82 -3.06,-67.79 C-3.91,-67.55 -4.69,-67.21 -5.49,-66.79 C-5.56,-66.75 -5.66,-66.73 -5.73,-66.69 C-5.73,-66.69 -54.83,-38.29 -54.83,-38.29 C-57.01,-37.03 -58.66,-35.12 -59.61,-32.88 C-60.18,-31.48 -60.49,-29.96 -60.49,-28.4 C-60.49,-28.4 -60.51,27.65 -60.51,27.65 C-60.51,31.91 -58.24,35.85 -54.55,37.97z"></path></g></g><g transform="matrix(1,0,0,1,189.24,339.33)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.72,68.44)"><path fill="currentColor" fill-opacity="1" d=" M54.79,38.24 C58.31,36.22 60.47,32.47 60.47,28.39 C60.47,28.39 60.47,-28.4 60.47,-28.4 C60.47,-28.74 60.43,-29.07 60.4,-29.4 C59.87,-32.96 57.76,-36.12 54.59,-37.96 C54.59,-37.96 6,-66.05 6,-66.05 C2.32,-68.18 -2.21,-68.19 -5.9,-66.07 C-5.9,-66.07 -54.47,-38.17 -54.47,-38.17 C-58.17,-36.05 -60.45,-32.11 -60.45,-27.84 C-60.45,-27.84 -60.47,28.21 -60.47,28.21 C-60.47,30.29 -59.92,32.3 -58.93,34.05 C-58.9,34.1 -58.87,34.16 -58.83,34.22 C-58.68,34.48 -58.51,34.72 -58.34,34.97 C-58.04,35.39 -57.71,35.81 -57.33,36.19 C-57.22,36.3 -57.16,36.39 -57.06,36.5 C-56.45,37.11 -55.74,37.63 -54.98,38.11 C-54.91,38.15 -54.85,38.22 -54.76,38.24 C-54.76,38.24 -5.66,66.64 -5.66,66.64 C-4.36,67.41 -2.92,67.89 -1.46,68.09 C-0.97,68.15 -0.47,68.18 0.03,68.19 C1.98,68.18 3.95,67.67 5.69,66.64 C5.69,66.64 54.79,38.24 54.79,38.24z"></path></g></g><g transform="matrix(1,0,0,1,52.39,260.13)" opacity="1" ><g opacity="1" transform="matrix(1,0,0,1,60.76,68.43)"><path fill="currentColor" fill-opacity="1" d=" M-60.51,27.67 C-60.51,31.93 -58.24,35.87 -54.56,37.99 C-54.56,37.99 -5.95,66.06 -5.95,66.06 C-2.27,68.18 2.26,68.18 5.94,66.07 C5.94,66.07 54.53,38.18 54.53,38.18 C58.23,36.06 60.51,32.12 60.51,27.85 C60.51,27.85 60.51,2.25 60.51,2.25 C60.45,1.53 60.42,0.8 60.42,0.06 C60.42,0.06 60.42,-28.34 60.42,-28.34 C60.42,-29.26 60.29,-30.15 60.08,-31.01 C60.05,-31.19 60.01,-31.39 59.94,-31.56 C59.7,-32.38 59.36,-33.2 58.95,-33.96 C58.88,-34.06 58.81,-34.16 58.75,-34.3 C58.33,-34.98 57.86,-35.63 57.27,-36.22 C57.17,-36.32 57.1,-36.42 57.01,-36.52 C56.39,-37.14 55.68,-37.66 54.92,-38.13 C54.85,-38.17 54.79,-38.24 54.72,-38.27 C54.72,-38.27 5.62,-66.67 5.62,-66.67 C3.87,-67.68 1.92,-68.18 -0.03,-68.18 C-1.04,-68.18 -2.04,-68.06 -3.02,-67.8 C-3.97,-67.55 -4.89,-67.17 -5.76,-66.67 C-5.76,-66.67 -54.86,-38.27 -54.86,-38.27 C-56.59,-37.28 -57.99,-35.86 -58.96,-34.2 C-59.94,-32.45 -60.49,-30.46 -60.49,-28.38 C-60.49,-28.38 -60.51,27.67 -60.51,27.67z"></path></g></g></g></svg></span><span>Cognition</span></div>
+        <a class="nav-item active" onclick="showPage('overview')">Overview</a>
+        <a class="nav-item" onclick="showPage('assumptions')">Assumptions</a>
+        <a class="nav-item" onclick="showPage('pipeline-health')">Pipeline Health</a>
+        <a class="nav-item" onclick="showPage('headcount-gaps')">Headcount Gaps</a>
+        <a class="nav-item" onclick="showPage('funnel-analytics')">Funnel Analytics</a>
+        <a class="nav-item" onclick="showPage('offer-reconciliation')">Offer Reconciliation</a>
+        <a class="nav-item" onclick="showPage('attrition')">Attrition</a>
+        <a class="nav-item" onclick="showPage('time-to-fill')">Time to Fill</a>
+        <a class="nav-item" onclick="showPage('cost-analytics')">Cost Analytics</a>
+        <a class="nav-item" onclick="showPage('offer-analysis')">Offer Analysis</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Overview Page -->
+        <div id="overview" class="page active">
+            <div class="page-header">
+                <h1 class="page-title">Overview</h1>
+                <p class="page-subtitle">High-level metrics across all People Ops functions</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Candidates</div>
+                    <div class="kpi-value" id="overview-active-candidates">-</div>
+                    <div class="kpi-subtitle">In pipeline</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Time Target Breaches</div>
+                    <div class="kpi-value" id="overview-sla-breaches">-</div>
+                    <div class="kpi-subtitle">Warning + Critical</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Open Seats</div>
+                    <div class="kpi-value" id="overview-open-seats">-</div>
+                    <div class="kpi-subtitle">Across all departments</div>
+                </div>
+                <div class="kpi-card" style="cursor: pointer;" onclick="showCriticalRisks()">
+                    <div class="kpi-label">Critical Risks</div>
+                    <div class="kpi-value critical" id="overview-critical-risks">-</div>
+                    <div class="kpi-subtitle">High priority, no pipeline (click to view)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Offer Acceptance Rate</div>
+                    <div class="kpi-value" id="overview-acceptance-rate">-</div>
+                    <div class="kpi-subtitle">Of extended offers</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Early Attrition Rate</div>
+                    <div class="kpi-value" id="overview-attrition-rate">-</div>
+                    <div class="kpi-subtitle">&lt;12 months tenure</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Pipeline by Department</div>
+                    <div class="bar-chart" id="overview-pipeline-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Headcount Gap by Department</div>
+                    <div class="bar-chart" id="overview-headcount-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Health Page -->
+        <div id="pipeline-health" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Pipeline Health</h1>
+                <p class="page-subtitle">Time-in-stage target compliance and duration analysis</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Candidates</div>
+                    <div class="kpi-value" id="pipeline-total">-</div>
+                    <div class="kpi-subtitle">In active stages</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Warnings</div>
+                    <div class="kpi-value warning" id="pipeline-warnings">-</div>
+                    <div class="kpi-subtitle">Exceeded target</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Critical</div>
+                    <div class="kpi-value critical" id="pipeline-critical">-</div>
+                    <div class="kpi-subtitle">2x target exceeded</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Candidate Pipeline Status</div>
+                    <div class="table-filters">
+                        <select class="filter-select" id="pipeline-status-filter" onchange="filterPipelineTable()">
+                            <option value="all">All Status</option>
+                            <option value="OK">OK</option>
+                            <option value="Warning">Warning</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <select class="filter-select" id="pipeline-stage-filter" onchange="filterPipelineTable()">
+                            <option value="all">All Stages</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Current Stage</th>
+                            <th>Days in Stage</th>
+                            <th>Target (days)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pipeline-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Headcount Gaps Page -->
+        <div id="headcount-gaps" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Headcount Gaps</h1>
+                <p class="page-subtitle">Open positions vs. active pipeline coverage</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Open Seats</div>
+                    <div class="kpi-value" id="headcount-open-seats">-</div>
+                    <div class="kpi-subtitle">Across all departments</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Pipeline</div>
+                    <div class="kpi-value" id="headcount-active-pipeline">-</div>
+                    <div class="kpi-subtitle">Candidates in process</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Critical Risks</div>
+                    <div class="kpi-value critical" id="headcount-critical-risks">-</div>
+                    <div class="kpi-subtitle">High priority, no pipeline</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Headcount Gap Analysis</div>
+                    <div class="table-filters">
+                        <select class="filter-select" id="headcount-dept-filter" onchange="filterHeadcountTable()">
+                            <option value="all">All Departments</option>
+                        </select>
+                        <select class="filter-select" id="headcount-risk-filter" onchange="filterHeadcountTable()">
+                            <option value="all">All Risk Levels</option>
+                            <option value="Critical">Critical</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Level</th>
+                            <th>Open Seats</th>
+                            <th>Active Pipeline</th>
+                            <th>Priority</th>
+                            <th>Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody id="headcount-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Funnel Analytics Page -->
+        <div id="funnel-analytics" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Funnel Analytics</h1>
+                <p class="page-subtitle">Recruitment funnel metrics and conversion rates</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Offers Extended</div>
+                    <div class="kpi-value" id="funnel-offers-extended">-</div>
+                    <div class="kpi-subtitle">Total offers sent</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Offers Accepted</div>
+                    <div class="kpi-value" id="funnel-offers-accepted">-</div>
+                    <div class="kpi-subtitle">Successfully closed</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Acceptance Rate</div>
+                    <div class="kpi-value" id="funnel-acceptance-rate">-</div>
+                    <div class="kpi-subtitle">% of offers accepted</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Recruitment Funnel</div>
+                    <div class="funnel-container" id="funnel-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Stage Distribution</div>
+                    <div class="bar-chart" id="funnel-stage-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offer Reconciliation Page -->
+        <div id="offer-reconciliation" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Offer Reconciliation</h1>
+                <p class="page-subtitle">Offer letter vs. offer log CSV comparison</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Letters</div>
+                    <div class="kpi-value" id="recon-total-letters">-</div>
+                    <div class="kpi-subtitle">Offer letters parsed</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Matched</div>
+                    <div class="kpi-value" id="recon-matched">-</div>
+                    <div class="kpi-subtitle">Letters match offer log</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Mismatches</div>
+                    <div class="kpi-value critical" id="recon-mismatched">-</div>
+                    <div class="kpi-subtitle">Discrepancies found</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Offer Letter Reconciliation</div>
+                    <div class="table-filters">
+                        <select class="filter-select" id="recon-status-filter" onchange="filterReconTable()">
+                            <option value="all">All Status</option>
+                            <option value="Matched">Matched</option>
+                            <option value="Mismatch">Mismatch</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Candidate ID</th>
+                            <th>Base Salary (Letter)</th>
+                            <th>Base Salary (Log)</th>
+                            <th>Equity (Letter)</th>
+                            <th>Equity (Log)</th>
+                            <th>Signing Bonus (Letter)</th>
+                            <th>Signing Bonus (Log)</th>
+                            <th>Status</th>
+                            <th>Issues</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recon-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Attrition Page -->
+        <div id="attrition" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Attrition Analysis</h1>
+                <p class="page-subtitle">Early attrition patterns by department and manager</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Terminations</div>
+                    <div class="kpi-value" id="attrition-total">-</div>
+                    <div class="kpi-subtitle">All departures</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Early Attritions</div>
+                    <div class="kpi-value warning" id="attrition-early">-</div>
+                    <div class="kpi-subtitle">&lt;12 months tenure</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Early Attrition Rate</div>
+                    <div class="kpi-value" id="attrition-rate">-</div>
+                    <div class="kpi-subtitle">% of total terminations</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Early Attrition by Department</div>
+                    <div class="bar-chart" id="attrition-dept-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Early Attrition by Manager</div>
+                    <div class="bar-chart" id="attrition-manager-chart"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Early Attrition Details</div>
+                    <div class="table-filters">
+                        <select class="filter-select" id="attrition-dept-filter" onchange="filterAttritionTable()">
+                            <option value="all">All Departments</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Tenure (months)</th>
+                            <th>Termination Type</th>
+                            <th>Early Attrition</th>
+                            <th>Manager</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attrition-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Time to Fill Page -->
+        <div id="time-to-fill" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Time to Fill</h1>
+                <p class="page-subtitle">Hiring velocity analysis by department, level, and hiring manager</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Hired</div>
+                    <div class="kpi-value" id="ttf-total-hired">-</div>
+                    <div class="kpi-subtitle">Candidates hired</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Time to Fill</div>
+                    <div class="kpi-value" id="ttf-avg">-</div>
+                    <div class="kpi-subtitle">Days</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Median Time to Fill</div>
+                    <div class="kpi-value" id="ttf-median">-</div>
+                    <div class="kpi-subtitle">Days</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Fastest Fill</div>
+                    <div class="kpi-value" id="ttf-min">-</div>
+                    <div class="kpi-subtitle">Days</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Slowest Fill</div>
+                    <div class="kpi-value" id="ttf-max">-</div>
+                    <div class="kpi-subtitle">Days</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Time to Fill by Department</div>
+                    <div class="bar-chart" id="ttf-dept-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Time to Fill by Level</div>
+                    <div class="bar-chart" id="ttf-level-chart"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Time to Fill by Hiring Manager</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hiring Manager</th>
+                            <th>Hires</th>
+                            <th>Avg Days</th>
+                            <th>Median Days</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ttf-hm-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cost Analytics Page -->
+        <div id="cost-analytics" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Cost Analytics</h1>
+                <p class="page-subtitle">Cost per hire, budget utilization, and attrition cost analysis</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Budget</div>
+                    <div class="kpi-value" id="cost-total-budget">-</div>
+                    <div class="kpi-subtitle">Annual</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Actual Cost</div>
+                    <div class="kpi-value" id="cost-actual">-</div>
+                    <div class="kpi-subtitle">Annual</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Cost Per Hire</div>
+                    <div class="kpi-value" id="cost-per-hire">-</div>
+                    <div class="kpi-subtitle">Average</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Budget Utilization</div>
+                    <div class="kpi-value" id="cost-utilization">-</div>
+                    <div class="kpi-subtitle">% of budget</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Attrition Cost</div>
+                    <div class="kpi-value critical" id="cost-attrition">-</div>
+                    <div class="kpi-subtitle">Replacement cost</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Early Attrition Cost</div>
+                    <div class="kpi-value warning" id="cost-early-attrition">-</div>
+                    <div class="kpi-subtitle">&lt;12 months</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Cost Per Hire by Department</div>
+                    <div class="bar-chart" id="cost-dept-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Attrition Cost by Department</div>
+                    <div class="bar-chart" id="cost-attrition-chart"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Cost Per Hire by Department</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Hires</th>
+                            <th>Budget</th>
+                            <th>Actual Cost</th>
+                            <th>Cost Per Hire</th>
+                            <th>Budget Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Offer Analysis Page -->
+        <div id="offer-analysis" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Offer Analysis</h1>
+                <p class="page-subtitle">Offer decline patterns, reasons, and compensation analysis</p>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Offers</div>
+                    <div class="kpi-value" id="offer-total">-</div>
+                    <div class="kpi-subtitle">All offers</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Declined</div>
+                    <div class="kpi-value warning" id="offer-declined">-</div>
+                    <div class="kpi-subtitle">Declined offers</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Decline Rate</div>
+                    <div class="kpi-value" id="offer-decline-rate">-</div>
+                    <div class="kpi-subtitle">% of offers</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">With Competing Offer</div>
+                    <div class="kpi-value" id="offer-competing">-</div>
+                    <div class="kpi-subtitle">% of declines</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-container">
+                    <div class="chart-title">Decline Reasons</div>
+                    <div class="bar-chart" id="offer-reasons-chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Top Roles by Volume</div>
+                    <div class="bar-chart" id="offer-roles-chart"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Declined Offer Details</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Offered Salary</th>
+                            <th>Avg Accepted Salary</th>
+                            <th>Comp Gap</th>
+                            <th>Decline Reason</th>
+                            <th>Competing Offer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offer-decline-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Assumptions Page -->
+        <div id="assumptions" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Assumptions</h1>
+                <p class="page-subtitle">Configure parameters for pipeline health and risk calculations</p>
+            </div>
+
+            <div class="assumptions-container">
+                <div class="assumptions-section">
+                    <h2 class="section-title">Stage Time Targets (days)</h2>
+                    <p class="section-subtitle">Target duration for each recruitment stage</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Applied</label>
+                            <input type="number" class="form-input" id="sla-applied" value="3" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Screen</label>
+                            <input type="number" class="form-input" id="sla-phone-screen" value="7" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Technical/Assessment</label>
+                            <input type="number" class="form-input" id="sla-assessment" value="10" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hiring Manager Interview</label>
+                            <input type="number" class="form-input" id="sla-hm-interview" value="10" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Final Round</label>
+                            <input type="number" class="form-input" id="sla-final-round" value="14" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Offer Extended</label>
+                            <input type="number" class="form-input" id="sla-offer-extended" value="5" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Offer Accepted</label>
+                            <input type="number" class="form-input" id="sla-offer-accepted" value="5" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="assumptions-section">
+                    <h2 class="section-title">Headcount Risk Thresholds</h2>
+                    <p class="section-subtitle">Criteria for determining headcount gap risk levels</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Critical Risk Condition</label>
+                            <select class="form-input" id="risk-critical-condition">
+                                <option value="high_no_pipeline">High priority + no pipeline</option>
+                                <option value="any_no_pipeline">Any priority + no pipeline</option>
+                                <option value="low_pipeline">Pipeline &lt; 50% of open seats</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Medium Risk Pipeline Threshold (%)</label>
+                            <input type="number" class="form-input" id="risk-medium-threshold" value="50" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="assumptions-section">
+                    <h2 class="section-title">Attrition Thresholds</h2>
+                    <p class="section-subtitle">Define early attrition and alert thresholds</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Early Attrition Threshold (months)</label>
+                            <input type="number" class="form-input" id="attrition-early-threshold" value="12" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">High Attrition Rate Alert (%)</label>
+                            <input type="number" class="form-input" id="attrition-high-rate" value="20" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="assumptions-section">
+                    <h2 class="section-title">Time Target Alert Thresholds</h2>
+                    <p class="section-subtitle">Multipliers for warning and critical alerts</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Warning Multiplier (× Target)</label>
+                            <input type="number" class="form-input" id="sla-warning-multiplier" value="1.0" step="0.1" min="1.0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Critical Multiplier (× Target)</label>
+                            <input type="number" class="form-input" id="sla-critical-multiplier" value="2.0" step="0.1" min="1.0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="assumptions-actions">
+                    <button class="btn btn-primary" onclick="applyAssumptions()">Apply Assumptions</button>
+                    <button class="btn btn-secondary" onclick="resetAssumptions()">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Data will be injected here by build.py
+        const DATA = {
+  "pipeline_health": {
+    "candidates": [
+      {
+        "candidate_id": "C101",
+        "candidate_name": "Liam Diaz",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 12,
+        "target": 10,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C102",
+        "candidate_name": "Noah Hughes",
+        "current_stage": "Final Round",
+        "days_in_stage": 2,
+        "target": 14,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C103",
+        "candidate_name": "Emma Klein",
+        "current_stage": "Applied",
+        "days_in_stage": 4,
+        "target": 3,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C104",
+        "candidate_name": "Olivia Novak",
+        "current_stage": "Final Round",
+        "days_in_stage": 15,
+        "target": 14,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C105",
+        "candidate_name": "Ethan Quinn",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 2,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C106",
+        "candidate_name": "Mia Tran",
+        "current_stage": "Final Round",
+        "days_in_stage": 18,
+        "target": 14,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C107",
+        "candidate_name": "Lucas Kim",
+        "current_stage": "Final Round",
+        "days_in_stage": 11,
+        "target": 14,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C108",
+        "candidate_name": "Zoe Flores",
+        "current_stage": "Final Round",
+        "days_in_stage": 40,
+        "target": 14,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C109",
+        "candidate_name": "Kai Iyer",
+        "current_stage": "Applied",
+        "days_in_stage": 6,
+        "target": 3,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C110",
+        "candidate_name": "Ivy Lowe",
+        "current_stage": "Final Round",
+        "days_in_stage": 32,
+        "target": 14,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C111",
+        "candidate_name": "Leo Ortiz",
+        "current_stage": "Phone Screen",
+        "days_in_stage": 21,
+        "target": 7,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C112",
+        "candidate_name": "Nora Ross",
+        "current_stage": "Offer Extended",
+        "days_in_stage": 4,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C113",
+        "candidate_name": "Owen Vega",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 12,
+        "target": 10,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C114",
+        "candidate_name": "Ada Brooks",
+        "current_stage": "Offer Extended",
+        "days_in_stage": 3,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C115",
+        "candidate_name": "Ravi Grant",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 5,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C116",
+        "candidate_name": "Sana Jansen",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 2,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C117",
+        "candidate_name": "Theo Mora",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 5,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C118",
+        "candidate_name": "Uma Park",
+        "current_stage": "Phone Screen",
+        "days_in_stage": 2,
+        "target": 7,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C119",
+        "candidate_name": "Wren Shah",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 23,
+        "target": 10,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C120",
+        "candidate_name": "Ava Reyes",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 10,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C121",
+        "candidate_name": "Liam Diaz",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 33,
+        "target": 10,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C122",
+        "candidate_name": "Noah Hughes",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 8,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C123",
+        "candidate_name": "Emma Klein",
+        "current_stage": "Applied",
+        "days_in_stage": 10,
+        "target": 3,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C124",
+        "candidate_name": "Olivia Novak",
+        "current_stage": "Applied",
+        "days_in_stage": 1,
+        "target": 3,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C125",
+        "candidate_name": "Ethan Quinn",
+        "current_stage": "Applied",
+        "days_in_stage": 11,
+        "target": 3,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C126",
+        "candidate_name": "Mia Tran",
+        "current_stage": "Final Round",
+        "days_in_stage": 2,
+        "target": 14,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C127",
+        "candidate_name": "Lucas Kim",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 3,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C128",
+        "candidate_name": "Zoe Flores",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 10,
+        "target": 5,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C129",
+        "candidate_name": "Kai Iyer",
+        "current_stage": "Offer Extended",
+        "days_in_stage": 1,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C130",
+        "candidate_name": "Ivy Lowe",
+        "current_stage": "Phone Screen",
+        "days_in_stage": 2,
+        "target": 7,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C131",
+        "candidate_name": "Leo Ortiz",
+        "current_stage": "Final Round",
+        "days_in_stage": 35,
+        "target": 14,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C132",
+        "candidate_name": "Nora Ross",
+        "current_stage": "Final Round",
+        "days_in_stage": 12,
+        "target": 14,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C133",
+        "candidate_name": "Owen Vega",
+        "current_stage": "Technical/Assessment",
+        "days_in_stage": 10,
+        "target": 10,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C134",
+        "candidate_name": "Ada Brooks",
+        "current_stage": "Applied",
+        "days_in_stage": 1,
+        "target": 3,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C135",
+        "candidate_name": "Ravi Grant",
+        "current_stage": "Hiring Manager Interview",
+        "days_in_stage": 20,
+        "target": 10,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C136",
+        "candidate_name": "Sana Jansen",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 9,
+        "target": 5,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C137",
+        "candidate_name": "Theo Mora",
+        "current_stage": "Applied",
+        "days_in_stage": 12,
+        "target": 3,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C138",
+        "candidate_name": "Uma Park",
+        "current_stage": "Offer Extended",
+        "days_in_stage": 2,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C139",
+        "candidate_name": "Wren Shah",
+        "current_stage": "Final Round",
+        "days_in_stage": 44,
+        "target": 14,
+        "status": "Critical"
+      },
+      {
+        "candidate_id": "C140",
+        "candidate_name": "Ava Reyes",
+        "current_stage": "Applied",
+        "days_in_stage": 3,
+        "target": 3,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C141",
+        "candidate_name": "Liam Diaz",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 2,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C142",
+        "candidate_name": "Noah Hughes",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 8,
+        "target": 5,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C143",
+        "candidate_name": "Emma Klein",
+        "current_stage": "Offer Extended",
+        "days_in_stage": 10,
+        "target": 5,
+        "status": "Warning"
+      },
+      {
+        "candidate_id": "C144",
+        "candidate_name": "Olivia Novak",
+        "current_stage": "Offer Accepted",
+        "days_in_stage": 2,
+        "target": 5,
+        "status": "OK"
+      },
+      {
+        "candidate_id": "C145",
+        "candidate_name": "Ethan Quinn",
+        "current_stage": "Final Round",
+        "days_in_stage": 23,
+        "target": 14,
+        "status": "Warning"
+      }
+    ],
+    "summary": {
+      "total_candidates": 45,
+      "warning_count": 12,
+      "critical_count": 10
+    }
+  },
+  "headcount_gaps": {
+    "gaps": [
+      {
+        "department": "Engineering",
+        "level": "Junior",
+        "approved_headcount": 6,
+        "filled_seats": 2,
+        "open_seats": 4,
+        "active_pipeline": 0,
+        "priority": "Medium",
+        "risk": "Medium"
+      },
+      {
+        "department": "Engineering",
+        "level": "Senior",
+        "approved_headcount": 4,
+        "filled_seats": 4,
+        "open_seats": 0,
+        "active_pipeline": 0,
+        "priority": "High",
+        "risk": "Low"
+      },
+      {
+        "department": "Engineering",
+        "level": "Staff",
+        "approved_headcount": 4,
+        "filled_seats": 4,
+        "open_seats": 0,
+        "active_pipeline": 0,
+        "priority": "Medium",
+        "risk": "Low"
+      },
+      {
+        "department": "Sales",
+        "level": "Senior",
+        "approved_headcount": 11,
+        "filled_seats": 9,
+        "open_seats": 2,
+        "active_pipeline": 1,
+        "priority": "Low",
+        "risk": "Low"
+      },
+      {
+        "department": "Sales",
+        "level": "Mid",
+        "approved_headcount": 6,
+        "filled_seats": 6,
+        "open_seats": 0,
+        "active_pipeline": 1,
+        "priority": "Medium",
+        "risk": "Low"
+      },
+      {
+        "department": "Marketing",
+        "level": "Staff",
+        "approved_headcount": 9,
+        "filled_seats": 2,
+        "open_seats": 7,
+        "active_pipeline": 1,
+        "priority": "Low",
+        "risk": "Medium"
+      },
+      {
+        "department": "Marketing",
+        "level": "Junior",
+        "approved_headcount": 8,
+        "filled_seats": 2,
+        "open_seats": 6,
+        "active_pipeline": 3,
+        "priority": "Medium",
+        "risk": "Low"
+      },
+      {
+        "department": "Product",
+        "level": "Mid",
+        "approved_headcount": 7,
+        "filled_seats": 7,
+        "open_seats": 0,
+        "active_pipeline": 1,
+        "priority": "High",
+        "risk": "Low"
+      },
+      {
+        "department": "Product",
+        "level": "Senior",
+        "approved_headcount": 5,
+        "filled_seats": 3,
+        "open_seats": 2,
+        "active_pipeline": 0,
+        "priority": "Medium",
+        "risk": "Medium"
+      },
+      {
+        "department": "Operations",
+        "level": "Staff",
+        "approved_headcount": 4,
+        "filled_seats": 4,
+        "open_seats": 0,
+        "active_pipeline": 1,
+        "priority": "Low",
+        "risk": "Low"
+      },
+      {
+        "department": "Operations",
+        "level": "Junior",
+        "approved_headcount": 6,
+        "filled_seats": 2,
+        "open_seats": 4,
+        "active_pipeline": 0,
+        "priority": "Low",
+        "risk": "Medium"
+      },
+      {
+        "department": "Finance",
+        "level": "Senior",
+        "approved_headcount": 8,
+        "filled_seats": 6,
+        "open_seats": 2,
+        "active_pipeline": 1,
+        "priority": "High",
+        "risk": "Low"
+      },
+      {
+        "department": "Finance",
+        "level": "Mid",
+        "approved_headcount": 8,
+        "filled_seats": 1,
+        "open_seats": 7,
+        "active_pipeline": 3,
+        "priority": "Medium",
+        "risk": "Medium"
+      },
+      {
+        "department": "Finance",
+        "level": "Junior",
+        "approved_headcount": 10,
+        "filled_seats": 8,
+        "open_seats": 2,
+        "active_pipeline": 3,
+        "priority": "High",
+        "risk": "Low"
+      },
+      {
+        "department": "Design",
+        "level": "Senior",
+        "approved_headcount": 4,
+        "filled_seats": 2,
+        "open_seats": 2,
+        "active_pipeline": 1,
+        "priority": "High",
+        "risk": "Low"
+      },
+      {
+        "department": "Design",
+        "level": "Staff",
+        "approved_headcount": 7,
+        "filled_seats": 3,
+        "open_seats": 4,
+        "active_pipeline": 1,
+        "priority": "High",
+        "risk": "Medium"
+      },
+      {
+        "department": "Design",
+        "level": "Junior",
+        "approved_headcount": 5,
+        "filled_seats": 3,
+        "open_seats": 2,
+        "active_pipeline": 1,
+        "priority": "Medium",
+        "risk": "Low"
+      },
+      {
+        "department": "Support",
+        "level": "Staff",
+        "approved_headcount": 8,
+        "filled_seats": 2,
+        "open_seats": 6,
+        "active_pipeline": 1,
+        "priority": "Medium",
+        "risk": "Medium"
+      },
+      {
+        "department": "Support",
+        "level": "Junior",
+        "approved_headcount": 5,
+        "filled_seats": 4,
+        "open_seats": 1,
+        "active_pipeline": 0,
+        "priority": "High",
+        "risk": "Critical"
+      },
+      {
+        "department": "Support",
+        "level": "Mid",
+        "approved_headcount": 3,
+        "filled_seats": 3,
+        "open_seats": 0,
+        "active_pipeline": 1,
+        "priority": "High",
+        "risk": "Low"
+      }
+    ],
+    "critical_risks": [
+      {
+        "department": "Support",
+        "level": "Junior",
+        "open_seats": 1,
+        "priority": "High"
+      }
+    ],
+    "summary": {
+      "total_open_seats": 51,
+      "total_active_pipeline": 20,
+      "critical_risk_count": 1
+    }
+  },
+  "offer_funnel": {
+    "stage_counts": {
+      "Hiring Manager Interview": 10,
+      "Final Round": 11,
+      "Applied": 8,
+      "Phone Screen": 3,
+      "Offer Extended": 5,
+      "Offer Accepted": 7,
+      "Technical/Assessment": 1
+    },
+    "offer_metrics": {
+      "offer_extended": 5,
+      "offer_accepted": 7,
+      "offer_declined": 0,
+      "offer_negotiating": 0,
+      "acceptance_rate": 58.3
+    }
+  },
+  "offer_reconciliation": {
+    "reconciliations": [],
+    "mismatches": [],
+    "summary": {
+      "total_letters": 0,
+      "matched": 0,
+      "mismatched": 0
+    }
+  },
+  "attrition": {
+    "terminations": [
+      {
+        "employee_id": "E301",
+        "employee_name": "Emma Klein",
+        "department": "Finance",
+        "tenure_months": 9,
+        "is_early_attrition": true,
+        "termination_reason": "Involuntary",
+        "manager": "F. Silva"
+      },
+      {
+        "employee_id": "E302",
+        "employee_name": "Olivia Novak",
+        "department": "Operations",
+        "tenure_months": 25,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "D. Patel"
+      },
+      {
+        "employee_id": "E303",
+        "employee_name": "Ethan Quinn",
+        "department": "Sales",
+        "tenure_months": 29,
+        "is_early_attrition": false,
+        "termination_reason": "Relocation",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E307",
+        "employee_name": "Kai Iyer",
+        "department": "Engineering",
+        "tenure_months": 27,
+        "is_early_attrition": false,
+        "termination_reason": "Performance",
+        "manager": "E. Nguyen"
+      },
+      {
+        "employee_id": "E309",
+        "employee_name": "Leo Ortiz",
+        "department": "Support",
+        "tenure_months": 10,
+        "is_early_attrition": true,
+        "termination_reason": "Relocation",
+        "manager": "D. Patel"
+      },
+      {
+        "employee_id": "E311",
+        "employee_name": "Owen Vega",
+        "department": "Finance",
+        "tenure_months": 21,
+        "is_early_attrition": false,
+        "termination_reason": "Relocation",
+        "manager": "F. Silva"
+      },
+      {
+        "employee_id": "E312",
+        "employee_name": "Ada Brooks",
+        "department": "Design",
+        "tenure_months": 17,
+        "is_early_attrition": false,
+        "termination_reason": "Relocation",
+        "manager": "D. Patel"
+      },
+      {
+        "employee_id": "E315",
+        "employee_name": "Theo Mora",
+        "department": "Product",
+        "tenure_months": 23,
+        "is_early_attrition": false,
+        "termination_reason": "Better Offer",
+        "manager": "D. Patel"
+      },
+      {
+        "employee_id": "E317",
+        "employee_name": "Wren Shah",
+        "department": "Finance",
+        "tenure_months": 7,
+        "is_early_attrition": true,
+        "termination_reason": "Relocation",
+        "manager": "B. Chen"
+      },
+      {
+        "employee_id": "E318",
+        "employee_name": "Ava Reyes",
+        "department": "Operations",
+        "tenure_months": 14,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "F. Silva"
+      },
+      {
+        "employee_id": "E319",
+        "employee_name": "Liam Diaz",
+        "department": "Design",
+        "tenure_months": 35,
+        "is_early_attrition": false,
+        "termination_reason": "Involuntary",
+        "manager": "D. Patel"
+      },
+      {
+        "employee_id": "E323",
+        "employee_name": "Ethan Quinn",
+        "department": "Design",
+        "tenure_months": 30,
+        "is_early_attrition": false,
+        "termination_reason": "Better Offer",
+        "manager": "C. Okafor"
+      },
+      {
+        "employee_id": "E326",
+        "employee_name": "Zoe Flores",
+        "department": "Support",
+        "tenure_months": 17,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "B. Chen"
+      },
+      {
+        "employee_id": "E327",
+        "employee_name": "Kai Iyer",
+        "department": "Marketing",
+        "tenure_months": 8,
+        "is_early_attrition": true,
+        "termination_reason": "Better Offer",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E329",
+        "employee_name": "Leo Ortiz",
+        "department": "Engineering",
+        "tenure_months": 21,
+        "is_early_attrition": false,
+        "termination_reason": "Involuntary",
+        "manager": "F. Silva"
+      },
+      {
+        "employee_id": "E330",
+        "employee_name": "Nora Ross",
+        "department": "Design",
+        "tenure_months": 9,
+        "is_early_attrition": true,
+        "termination_reason": "Voluntary",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E331",
+        "employee_name": "Owen Vega",
+        "department": "Product",
+        "tenure_months": 18,
+        "is_early_attrition": false,
+        "termination_reason": "Involuntary",
+        "manager": "E. Nguyen"
+      },
+      {
+        "employee_id": "E332",
+        "employee_name": "Ada Brooks",
+        "department": "Engineering",
+        "tenure_months": 21,
+        "is_early_attrition": false,
+        "termination_reason": "Better Offer",
+        "manager": "C. Okafor"
+      },
+      {
+        "employee_id": "E333",
+        "employee_name": "Ravi Grant",
+        "department": "Product",
+        "tenure_months": 35,
+        "is_early_attrition": false,
+        "termination_reason": "Involuntary",
+        "manager": "E. Nguyen"
+      },
+      {
+        "employee_id": "E334",
+        "employee_name": "Sana Jansen",
+        "department": "Engineering",
+        "tenure_months": 21,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E335",
+        "employee_name": "Theo Mora",
+        "department": "Support",
+        "tenure_months": 28,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "C. Okafor"
+      },
+      {
+        "employee_id": "E336",
+        "employee_name": "Uma Park",
+        "department": "Design",
+        "tenure_months": 16,
+        "is_early_attrition": false,
+        "termination_reason": "Better Offer",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E337",
+        "employee_name": "Wren Shah",
+        "department": "Design",
+        "tenure_months": 27,
+        "is_early_attrition": false,
+        "termination_reason": "Involuntary",
+        "manager": "A. Rivera"
+      },
+      {
+        "employee_id": "E340",
+        "employee_name": "Noah Hughes",
+        "department": "Product",
+        "tenure_months": 20,
+        "is_early_attrition": false,
+        "termination_reason": "Voluntary",
+        "manager": "E. Nguyen"
+      }
+    ],
+    "early_attritions": [
+      {
+        "employee_id": "E301",
+        "employee_name": "Emma Klein",
+        "department": "Finance",
+        "tenure_months": 9,
+        "termination_reason": "Involuntary",
+        "manager": "F. Silva",
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E309",
+        "employee_name": "Leo Ortiz",
+        "department": "Support",
+        "tenure_months": 10,
+        "termination_reason": "Relocation",
+        "manager": "D. Patel",
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E317",
+        "employee_name": "Wren Shah",
+        "department": "Finance",
+        "tenure_months": 7,
+        "termination_reason": "Relocation",
+        "manager": "B. Chen",
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E327",
+        "employee_name": "Kai Iyer",
+        "department": "Marketing",
+        "tenure_months": 8,
+        "termination_reason": "Better Offer",
+        "manager": "A. Rivera",
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E330",
+        "employee_name": "Nora Ross",
+        "department": "Design",
+        "tenure_months": 9,
+        "termination_reason": "Voluntary",
+        "manager": "A. Rivera",
+        "is_early_attrition": true
+      }
+    ],
+    "department_summary": [
+      {
+        "department": "Finance",
+        "total_terminations": 3,
+        "early_attritions": 2,
+        "early_attrition_rate": 66.7
+      },
+      {
+        "department": "Operations",
+        "total_terminations": 2,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      },
+      {
+        "department": "Sales",
+        "total_terminations": 1,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      },
+      {
+        "department": "Engineering",
+        "total_terminations": 4,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      },
+      {
+        "department": "Support",
+        "total_terminations": 3,
+        "early_attritions": 1,
+        "early_attrition_rate": 33.3
+      },
+      {
+        "department": "Design",
+        "total_terminations": 6,
+        "early_attritions": 1,
+        "early_attrition_rate": 16.7
+      },
+      {
+        "department": "Product",
+        "total_terminations": 4,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      },
+      {
+        "department": "Marketing",
+        "total_terminations": 1,
+        "early_attritions": 1,
+        "early_attrition_rate": 100.0
+      }
+    ],
+    "manager_summary": [
+      {
+        "manager": "F. Silva",
+        "total_terminations": 4,
+        "early_attritions": 1,
+        "early_attrition_rate": 25.0
+      },
+      {
+        "manager": "D. Patel",
+        "total_terminations": 5,
+        "early_attritions": 1,
+        "early_attrition_rate": 20.0
+      },
+      {
+        "manager": "A. Rivera",
+        "total_terminations": 6,
+        "early_attritions": 2,
+        "early_attrition_rate": 33.3
+      },
+      {
+        "manager": "E. Nguyen",
+        "total_terminations": 4,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      },
+      {
+        "manager": "B. Chen",
+        "total_terminations": 2,
+        "early_attritions": 1,
+        "early_attrition_rate": 50.0
+      },
+      {
+        "manager": "C. Okafor",
+        "total_terminations": 3,
+        "early_attritions": 0,
+        "early_attrition_rate": 0.0
+      }
+    ],
+    "summary": {
+      "total_terminations": 24,
+      "total_early_attritions": 5,
+      "overall_early_attrition_rate": 20.8
+    }
+  },
+  "time_to_fill": {
+    "hired_candidates": [
+      {
+        "candidate_id": "C116",
+        "candidate_name": "Sana Jansen",
+        "role": "Staff Design Specialist",
+        "department": "Design",
+        "level": "Staff",
+        "hiring_manager": "D. Patel",
+        "time_to_fill_days": 85.0,
+        "source": "Inbound"
+      },
+      {
+        "candidate_id": "C117",
+        "candidate_name": "Theo Mora",
+        "role": "Mid Operation Specialist",
+        "department": "Operations",
+        "level": "Mid",
+        "hiring_manager": "F. Silva",
+        "time_to_fill_days": 63.0,
+        "source": "Recruiter"
+      },
+      {
+        "candidate_id": "C128",
+        "candidate_name": "Zoe Flores",
+        "role": "Staff Operation Specialist",
+        "department": "Operations",
+        "level": "Staff",
+        "hiring_manager": "B. Chen",
+        "time_to_fill_days": 30.0,
+        "source": "Inbound"
+      },
+      {
+        "candidate_id": "C136",
+        "candidate_name": "Sana Jansen",
+        "role": "Junior Finance Specialist",
+        "department": "Finance",
+        "level": "Junior",
+        "hiring_manager": "D. Patel",
+        "time_to_fill_days": 53.0,
+        "source": "LinkedIn"
+      },
+      {
+        "candidate_id": "C141",
+        "candidate_name": "Liam Diaz",
+        "role": "Staff Marketing Specialist",
+        "department": "Marketing",
+        "level": "Staff",
+        "hiring_manager": "C. Okafor",
+        "time_to_fill_days": 31.0,
+        "source": "LinkedIn"
+      },
+      {
+        "candidate_id": "C142",
+        "candidate_name": "Noah Hughes",
+        "role": "Mid Operation Specialist",
+        "department": "Operations",
+        "level": "Mid",
+        "hiring_manager": "B. Chen",
+        "time_to_fill_days": 81.0,
+        "source": "Referral"
+      },
+      {
+        "candidate_id": "C144",
+        "candidate_name": "Olivia Novak",
+        "role": "Junior Marketing Specialist",
+        "department": "Marketing",
+        "level": "Junior",
+        "hiring_manager": "B. Chen",
+        "time_to_fill_days": 28.0,
+        "source": "LinkedIn"
+      }
+    ],
+    "by_department": [
+      {
+        "department": "Design",
+        "count": 1,
+        "avg_time_to_fill": 85.0,
+        "median_time_to_fill": 85.0
+      },
+      {
+        "department": "Operations",
+        "count": 3,
+        "avg_time_to_fill": 58.0,
+        "median_time_to_fill": 63.0
+      },
+      {
+        "department": "Finance",
+        "count": 1,
+        "avg_time_to_fill": 53.0,
+        "median_time_to_fill": 53.0
+      },
+      {
+        "department": "Marketing",
+        "count": 2,
+        "avg_time_to_fill": 29.5,
+        "median_time_to_fill": 31.0
+      }
+    ],
+    "by_level": [
+      {
+        "level": "Mid",
+        "count": 2,
+        "avg_time_to_fill": 72.0,
+        "median_time_to_fill": 81.0
+      },
+      {
+        "level": "Staff",
+        "count": 3,
+        "avg_time_to_fill": 48.7,
+        "median_time_to_fill": 31.0
+      },
+      {
+        "level": "Junior",
+        "count": 2,
+        "avg_time_to_fill": 40.5,
+        "median_time_to_fill": 53.0
+      }
+    ],
+    "by_role": [
+      {
+        "role": "Mid Operation Specialist",
+        "count": 2,
+        "avg_time_to_fill": 72.0,
+        "median_time_to_fill": 81.0
+      },
+      {
+        "role": "Staff Design Specialist",
+        "count": 1,
+        "avg_time_to_fill": 85.0,
+        "median_time_to_fill": 85.0
+      },
+      {
+        "role": "Staff Operation Specialist",
+        "count": 1,
+        "avg_time_to_fill": 30.0,
+        "median_time_to_fill": 30.0
+      },
+      {
+        "role": "Junior Finance Specialist",
+        "count": 1,
+        "avg_time_to_fill": 53.0,
+        "median_time_to_fill": 53.0
+      },
+      {
+        "role": "Staff Marketing Specialist",
+        "count": 1,
+        "avg_time_to_fill": 31.0,
+        "median_time_to_fill": 31.0
+      },
+      {
+        "role": "Junior Marketing Specialist",
+        "count": 1,
+        "avg_time_to_fill": 28.0,
+        "median_time_to_fill": 28.0
+      }
+    ],
+    "by_hiring_manager": [
+      {
+        "hiring_manager": "D. Patel",
+        "count": 2,
+        "avg_time_to_fill": 69.0,
+        "median_time_to_fill": 85.0
+      },
+      {
+        "hiring_manager": "F. Silva",
+        "count": 1,
+        "avg_time_to_fill": 63.0,
+        "median_time_to_fill": 63.0
+      },
+      {
+        "hiring_manager": "B. Chen",
+        "count": 3,
+        "avg_time_to_fill": 46.3,
+        "median_time_to_fill": 30.0
+      },
+      {
+        "hiring_manager": "C. Okafor",
+        "count": 1,
+        "avg_time_to_fill": 31.0,
+        "median_time_to_fill": 31.0
+      }
+    ],
+    "summary": {
+      "total_hired": 7,
+      "avg_time_to_fill": 53.0,
+      "median_time_to_fill": 53.0,
+      "min_time_to_fill": 28.0,
+      "max_time_to_fill": 85.0
+    }
+  },
+  "cost_analytics": {
+    "cost_per_hire": [
+      {
+        "department": "Marketing",
+        "hires": 2,
+        "annual_budget": 1392000.0,
+        "actual_cost": 1284200.0,
+        "cost_per_hire": 642100.0,
+        "budget_utilization": 92.3
+      },
+      {
+        "department": "Operations",
+        "hires": 2,
+        "annual_budget": 1110000.0,
+        "actual_cost": 727650.0,
+        "cost_per_hire": 363825.0,
+        "budget_utilization": 65.6
+      },
+      {
+        "department": "Product",
+        "hires": 3,
+        "annual_budget": 760000.0,
+        "actual_cost": 727900.0,
+        "cost_per_hire": 242633.0,
+        "budget_utilization": 95.8
+      },
+      {
+        "department": "Support",
+        "hires": 3,
+        "annual_budget": 459000.0,
+        "actual_cost": 674700.0,
+        "cost_per_hire": 224900.0,
+        "budget_utilization": 147.0
+      },
+      {
+        "department": "Design",
+        "hires": 3,
+        "annual_budget": 870000.0,
+        "actual_cost": 577450.0,
+        "cost_per_hire": 192483.0,
+        "budget_utilization": 66.4
+      },
+      {
+        "department": "Engineering",
+        "hires": 4,
+        "annual_budget": 792000.0,
+        "actual_cost": 394600.0,
+        "cost_per_hire": 98650.0,
+        "budget_utilization": 49.8
+      },
+      {
+        "department": "Sales",
+        "hires": 6,
+        "annual_budget": 1146000.0,
+        "actual_cost": 210050.0,
+        "cost_per_hire": 35008.0,
+        "budget_utilization": 18.3
+      },
+      {
+        "department": "Finance",
+        "hires": 8,
+        "annual_budget": 1690000.0,
+        "actual_cost": 0,
+        "cost_per_hire": 0.0,
+        "budget_utilization": 0.0
+      }
+    ],
+    "attrition_costs": [
+      {
+        "employee_id": "E301",
+        "employee_name": "Emma Klein",
+        "department": "Finance",
+        "annual_salary": 93000.0,
+        "replacement_cost": 139500.0,
+        "tenure_months": 9,
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E302",
+        "employee_name": "Olivia Novak",
+        "department": "Operations",
+        "annual_salary": 189000.0,
+        "replacement_cost": 283500.0,
+        "tenure_months": 25,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E303",
+        "employee_name": "Ethan Quinn",
+        "department": "Sales",
+        "annual_salary": 161000.0,
+        "replacement_cost": 241500.0,
+        "tenure_months": 29,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E307",
+        "employee_name": "Kai Iyer",
+        "department": "Engineering",
+        "annual_salary": 142000.0,
+        "replacement_cost": 213000.0,
+        "tenure_months": 27,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E309",
+        "employee_name": "Leo Ortiz",
+        "department": "Support",
+        "annual_salary": 102000.0,
+        "replacement_cost": 153000.0,
+        "tenure_months": 10,
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E311",
+        "employee_name": "Owen Vega",
+        "department": "Finance",
+        "annual_salary": 156000.0,
+        "replacement_cost": 234000.0,
+        "tenure_months": 21,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E312",
+        "employee_name": "Ada Brooks",
+        "department": "Design",
+        "annual_salary": 232000.0,
+        "replacement_cost": 348000.0,
+        "tenure_months": 17,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E315",
+        "employee_name": "Theo Mora",
+        "department": "Product",
+        "annual_salary": 125000.0,
+        "replacement_cost": 187500.0,
+        "tenure_months": 23,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E317",
+        "employee_name": "Wren Shah",
+        "department": "Finance",
+        "annual_salary": 184000.0,
+        "replacement_cost": 276000.0,
+        "tenure_months": 7,
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E318",
+        "employee_name": "Ava Reyes",
+        "department": "Operations",
+        "annual_salary": 195000.0,
+        "replacement_cost": 292500.0,
+        "tenure_months": 14,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E319",
+        "employee_name": "Liam Diaz",
+        "department": "Design",
+        "annual_salary": 159000.0,
+        "replacement_cost": 238500.0,
+        "tenure_months": 35,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E323",
+        "employee_name": "Ethan Quinn",
+        "department": "Design",
+        "annual_salary": 95000.0,
+        "replacement_cost": 142500.0,
+        "tenure_months": 30,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E326",
+        "employee_name": "Zoe Flores",
+        "department": "Support",
+        "annual_salary": 129000.0,
+        "replacement_cost": 193500.0,
+        "tenure_months": 17,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E327",
+        "employee_name": "Kai Iyer",
+        "department": "Marketing",
+        "annual_salary": 231000.0,
+        "replacement_cost": 346500.0,
+        "tenure_months": 8,
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E329",
+        "employee_name": "Leo Ortiz",
+        "department": "Engineering",
+        "annual_salary": 154000.0,
+        "replacement_cost": 231000.0,
+        "tenure_months": 21,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E330",
+        "employee_name": "Nora Ross",
+        "department": "Design",
+        "annual_salary": 166000.0,
+        "replacement_cost": 249000.0,
+        "tenure_months": 9,
+        "is_early_attrition": true
+      },
+      {
+        "employee_id": "E331",
+        "employee_name": "Owen Vega",
+        "department": "Product",
+        "annual_salary": 90000.0,
+        "replacement_cost": 135000.0,
+        "tenure_months": 18,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E332",
+        "employee_name": "Ada Brooks",
+        "department": "Engineering",
+        "annual_salary": 170000.0,
+        "replacement_cost": 255000.0,
+        "tenure_months": 21,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E333",
+        "employee_name": "Ravi Grant",
+        "department": "Product",
+        "annual_salary": 153000.0,
+        "replacement_cost": 229500.0,
+        "tenure_months": 35,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E334",
+        "employee_name": "Sana Jansen",
+        "department": "Engineering",
+        "annual_salary": 139000.0,
+        "replacement_cost": 208500.0,
+        "tenure_months": 21,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E335",
+        "employee_name": "Theo Mora",
+        "department": "Support",
+        "annual_salary": 148000.0,
+        "replacement_cost": 222000.0,
+        "tenure_months": 28,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E336",
+        "employee_name": "Uma Park",
+        "department": "Design",
+        "annual_salary": 176000.0,
+        "replacement_cost": 264000.0,
+        "tenure_months": 16,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E337",
+        "employee_name": "Wren Shah",
+        "department": "Design",
+        "annual_salary": 164000.0,
+        "replacement_cost": 246000.0,
+        "tenure_months": 27,
+        "is_early_attrition": false
+      },
+      {
+        "employee_id": "E340",
+        "employee_name": "Noah Hughes",
+        "department": "Product",
+        "annual_salary": 216000.0,
+        "replacement_cost": 324000.0,
+        "tenure_months": 20,
+        "is_early_attrition": false
+      }
+    ],
+    "attrition_by_department": [
+      {
+        "department": "Design",
+        "total_attrition_cost": 1488000.0,
+        "attrition_count": 6
+      },
+      {
+        "department": "Engineering",
+        "total_attrition_cost": 907500.0,
+        "attrition_count": 4
+      },
+      {
+        "department": "Product",
+        "total_attrition_cost": 876000.0,
+        "attrition_count": 4
+      },
+      {
+        "department": "Finance",
+        "total_attrition_cost": 649500.0,
+        "attrition_count": 3
+      },
+      {
+        "department": "Operations",
+        "total_attrition_cost": 576000.0,
+        "attrition_count": 2
+      },
+      {
+        "department": "Support",
+        "total_attrition_cost": 568500.0,
+        "attrition_count": 3
+      },
+      {
+        "department": "Marketing",
+        "total_attrition_cost": 346500.0,
+        "attrition_count": 1
+      },
+      {
+        "department": "Sales",
+        "total_attrition_cost": 241500.0,
+        "attrition_count": 1
+      }
+    ],
+    "summary": {
+      "total_budget": 8219000.0,
+      "total_actual_cost": 4596550.0,
+      "total_hires": 31,
+      "overall_cost_per_hire": 148276.0,
+      "overall_budget_utilization": 55.9,
+      "total_attrition_cost": 5653500.0,
+      "early_attrition_cost": 1164000.0
+    }
+  },
+  "offer_decline": {
+    "declined_offers": [
+      {
+        "candidate_id": "O202",
+        "candidate_name": "Lucas Kim",
+        "role": "Senior Design Role",
+        "department": "Design",
+        "level": "Senior",
+        "offered_salary": 249000.0,
+        "avg_accepted_salary": 243000.0,
+        "comp_gap": 6000.0,
+        "decline_reason": "Compensation",
+        "competing_offer": true,
+        "days_to_close": 35.0
+      },
+      {
+        "candidate_id": "O205",
+        "candidate_name": "Ivy Lowe",
+        "role": "Staff Product Role",
+        "department": "Product",
+        "level": "Staff",
+        "offered_salary": 152000.0,
+        "avg_accepted_salary": 0,
+        "comp_gap": 0,
+        "decline_reason": "Role Fit",
+        "competing_offer": false,
+        "days_to_close": 47.0
+      },
+      {
+        "candidate_id": "O206",
+        "candidate_name": "Leo Ortiz",
+        "role": "Mid Operations Role",
+        "department": "Operations",
+        "level": "Mid",
+        "offered_salary": 148000.0,
+        "avg_accepted_salary": 93000.0,
+        "comp_gap": 55000.0,
+        "decline_reason": "Competing Offer",
+        "competing_offer": false,
+        "days_to_close": 60.0
+      },
+      {
+        "candidate_id": "O213",
+        "candidate_name": "Uma Park",
+        "role": "Staff Marketing Role",
+        "department": "Marketing",
+        "level": "Staff",
+        "offered_salary": 173000.0,
+        "avg_accepted_salary": 178000.0,
+        "comp_gap": -5000.0,
+        "decline_reason": "Competing Offer",
+        "competing_offer": true,
+        "days_to_close": 59.0
+      },
+      {
+        "candidate_id": "O214",
+        "candidate_name": "Wren Shah",
+        "role": "Mid Design Role",
+        "department": "Design",
+        "level": "Mid",
+        "offered_salary": 224000.0,
+        "avg_accepted_salary": 0,
+        "comp_gap": 0,
+        "decline_reason": "Competing Offer",
+        "competing_offer": true,
+        "days_to_close": 57.0
+      },
+      {
+        "candidate_id": "O215",
+        "candidate_name": "Ava Reyes",
+        "role": "Junior Finance Role",
+        "department": "Finance",
+        "level": "Junior",
+        "offered_salary": 186000.0,
+        "avg_accepted_salary": 0,
+        "comp_gap": 0,
+        "decline_reason": "Counteroffer",
+        "competing_offer": true,
+        "days_to_close": 21.0
+      },
+      {
+        "candidate_id": "O216",
+        "candidate_name": "Liam Diaz",
+        "role": "Staff Engineering Role",
+        "department": "Engineering",
+        "level": "Staff",
+        "offered_salary": 107000.0,
+        "avg_accepted_salary": 95000.0,
+        "comp_gap": 12000.0,
+        "decline_reason": "Compensation",
+        "competing_offer": false,
+        "days_to_close": 53.0
+      },
+      {
+        "candidate_id": "O217",
+        "candidate_name": "Noah Hughes",
+        "role": "Senior Sales Role",
+        "department": "Sales",
+        "level": "Senior",
+        "offered_salary": 150000.0,
+        "avg_accepted_salary": 0,
+        "comp_gap": 0,
+        "decline_reason": "Role Fit",
+        "competing_offer": false,
+        "days_to_close": 49.0
+      },
+      {
+        "candidate_id": "O222",
+        "candidate_name": "Lucas Kim",
+        "role": "Senior Support Role",
+        "department": "Support",
+        "level": "Senior",
+        "offered_salary": 189000.0,
+        "avg_accepted_salary": 222000.0,
+        "comp_gap": -33000.0,
+        "decline_reason": "Competing Offer",
+        "competing_offer": false,
+        "days_to_close": 25.0
+      }
+    ],
+    "decline_reasons": [
+      {
+        "reason": "Competing Offer",
+        "count": 4,
+        "percentage": 44.4
+      },
+      {
+        "reason": "Compensation",
+        "count": 2,
+        "percentage": 22.2
+      },
+      {
+        "reason": "Role Fit",
+        "count": 2,
+        "percentage": 22.2
+      },
+      {
+        "reason": "Counteroffer",
+        "count": 1,
+        "percentage": 11.1
+      }
+    ],
+    "summary": {
+      "total_offers": 25,
+      "total_declined": 9,
+      "total_accepted": 16,
+      "decline_rate": 36.0,
+      "with_competing_offer": 4,
+      "without_competing_offer": 5,
+      "competing_offer_decline_rate": 44.4
+    }
+  },
+  "data_quality": {
+    "issues": [],
+    "warnings": [],
+    "summary": {
+      "total_issues": 0,
+      "total_warnings": 0,
+      "data_quality_score": 100
+    }
+  }
+};
+
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize Dashboard
+        function initDashboard(data) {
+            if (!data) return;
+
+            // Overview
+            initOverview(data);
+            
+            // Pipeline Health
+            initPipelineHealth(data.pipeline_health);
+            
+            // Headcount Gaps
+            initHeadcountGaps(data.headcount_gaps);
+            
+            // Funnel Analytics
+            initFunnelAnalytics(data.offer_funnel);
+            
+            // Offer Reconciliation
+            initOfferReconciliation(data.offer_reconciliation);
+            
+            // Attrition
+            initAttrition(data.attrition);
+            
+            // Time to Fill
+            initTimeToFill(data.time_to_fill);
+            
+            // Cost Analytics
+            initCostAnalytics(data.cost_analytics);
+            
+            // Offer Analysis
+            initOfferAnalysis(data.offer_decline);
+        }
+
+        function initOverview(data) {
+            const pipelineData = data.pipeline_health;
+            const headcountData = data.headcount_gaps;
+            const funnelData = data.offer_funnel;
+            const attritionData = data.attrition;
+
+            // KPIs
+            document.getElementById('overview-active-candidates').textContent = pipelineData.summary.total_candidates;
+            document.getElementById('overview-sla-breaches').textContent = pipelineData.summary.warning_count + pipelineData.summary.critical_count;
+            document.getElementById('overview-open-seats').textContent = headcountData.summary.total_open_seats;
+            document.getElementById('overview-critical-risks').textContent = headcountData.summary.critical_risk_count;
+            document.getElementById('overview-acceptance-rate').textContent = funnelData.offer_metrics.acceptance_rate + '%';
+            document.getElementById('overview-attrition-rate').textContent = attritionData.summary.overall_early_attrition_rate + '%';
+
+            // Pipeline by Department Chart
+            const pipelineChart = document.getElementById('overview-pipeline-chart');
+            const deptPipeline = {};
+            pipelineData.candidates.forEach(c => {
+                // Use department from candidate data if available, otherwise count by stage
+                const dept = c.department || c.current_stage;
+                if (!deptPipeline[dept]) deptPipeline[dept] = 0;
+                deptPipeline[dept]++;
+            });
+            
+            const maxPipeline = Math.max(...Object.values(deptPipeline), 1);
+            Object.entries(deptPipeline).forEach(([dept, count]) => {
+                const percentage = (count / maxPipeline) * 100;
+                pipelineChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${dept}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${count}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Headcount Gap Chart
+            const headcountChart = document.getElementById('overview-headcount-chart');
+            const deptGaps = {};
+            headcountData.gaps.forEach(g => {
+                if (!deptGaps[g.department]) deptGaps[g.department] = 0;
+                deptGaps[g.department] += g.open_seats;
+            });
+            
+            const maxGap = Math.max(...Object.values(deptGaps), 1);
+            Object.entries(deptGaps).forEach(([dept, gap]) => {
+                const percentage = (gap / maxGap) * 100;
+                headcountChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${dept}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${gap}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function initPipelineHealth(data) {
+            document.getElementById('pipeline-total').textContent = data.summary.total_candidates;
+            document.getElementById('pipeline-warnings').textContent = data.summary.warning_count;
+            document.getElementById('pipeline-critical').textContent = data.summary.critical_count;
+
+            // Populate stage filter
+            const stages = [...new Set(data.candidates.map(c => c.current_stage))];
+            const stageFilter = document.getElementById('pipeline-stage-filter');
+            stages.forEach(stage => {
+                stageFilter.innerHTML += `<option value="${stage}">${stage}</option>`;
+            });
+
+            // Populate table
+            renderPipelineTable(data.candidates);
+        }
+
+        function renderPipelineTable(candidates) {
+            const tbody = document.getElementById('pipeline-table-body');
+            tbody.innerHTML = '';
+            
+            candidates.forEach(c => {
+                const statusClass = c.status.toLowerCase();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${c.candidate_name}</td>
+                        <td>${c.current_stage}</td>
+                        <td>${c.days_in_stage}</td>
+                        <td>${c.target}</td>
+                        <td><span class="badge ${statusClass}">${c.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterPipelineTable() {
+            const statusFilter = document.getElementById('pipeline-status-filter').value;
+            const stageFilter = document.getElementById('pipeline-stage-filter').value;
+            
+            const data = DATA.pipeline_health.candidates.filter(c => {
+                const statusMatch = statusFilter === 'all' || c.status === statusFilter;
+                const stageMatch = stageFilter === 'all' || c.current_stage === stageFilter;
+                return statusMatch && stageMatch;
+            });
+            
+            renderPipelineTable(data);
+        }
+
+        function initHeadcountGaps(data) {
+            document.getElementById('headcount-open-seats').textContent = data.summary.total_open_seats;
+            document.getElementById('headcount-active-pipeline').textContent = data.summary.total_active_pipeline;
+            document.getElementById('headcount-critical-risks').textContent = data.summary.critical_risk_count;
+
+            // Populate department filter
+            const depts = [...new Set(data.gaps.map(g => g.department))];
+            const deptFilter = document.getElementById('headcount-dept-filter');
+            depts.forEach(dept => {
+                deptFilter.innerHTML += `<option value="${dept}">${dept}</option>`;
+            });
+
+            renderHeadcountTable(data.gaps);
+        }
+
+        function renderHeadcountTable(gaps) {
+            const tbody = document.getElementById('headcount-table-body');
+            tbody.innerHTML = '';
+            
+            gaps.forEach(g => {
+                const riskClass = g.risk.toLowerCase();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${g.department}</td>
+                        <td>${g.level}</td>
+                        <td>${g.open_seats}</td>
+                        <td>${g.active_pipeline}</td>
+                        <td>${g.priority}</td>
+                        <td><span class="badge ${riskClass}">${g.risk}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterHeadcountTable() {
+            const deptFilter = document.getElementById('headcount-dept-filter').value;
+            const riskFilter = document.getElementById('headcount-risk-filter').value;
+            
+            const data = DATA.headcount_gaps.gaps.filter(g => {
+                const deptMatch = deptFilter === 'all' || g.department === deptFilter;
+                const riskMatch = riskFilter === 'all' || g.risk === riskFilter;
+                return deptMatch && riskMatch;
+            });
+            
+            renderHeadcountTable(data);
+        }
+
+        function initFunnelAnalytics(data) {
+            document.getElementById('funnel-offers-extended').textContent = data.offer_metrics.offer_extended;
+            document.getElementById('funnel-offers-accepted').textContent = data.offer_metrics.offer_accepted;
+            document.getElementById('funnel-acceptance-rate').textContent = data.offer_metrics.acceptance_rate + '%';
+
+            // Funnel Chart
+            const funnelChart = document.getElementById('funnel-chart');
+            const stageOrder = ['Applied', 'Phone Screen', 'Technical/Assessment', 'Hiring Manager Interview', 'Final Round', 'Offer Extended', 'Offer Accepted'];
+            
+            stageOrder.forEach(stage => {
+                const count = data.stage_counts[stage] || 0;
+                if (count > 0) {
+                    funnelChart.innerHTML += `
+                        <div class="funnel-stage">
+                            <div class="funnel-stage-name">${stage}</div>
+                            <div class="funnel-stage-count">${count}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Stage Distribution Chart
+            const stageChart = document.getElementById('funnel-stage-chart');
+            const maxCount = Math.max(...Object.values(data.stage_counts), 1);
+            
+            Object.entries(data.stage_counts).forEach(([stage, count]) => {
+                const percentage = (count / maxCount) * 100;
+                stageChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${stage}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${count}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function initOfferReconciliation(data) {
+            document.getElementById('recon-total-letters').textContent = data.summary.total_letters;
+            document.getElementById('recon-matched').textContent = data.summary.matched;
+            document.getElementById('recon-mismatched').textContent = data.summary.mismatched;
+
+            renderReconTable(data.reconciliations);
+        }
+
+        function renderReconTable(reconciliations) {
+            const tbody = document.getElementById('recon-table-body');
+            tbody.innerHTML = '';
+            
+            reconciliations.forEach(r => {
+                const statusClass = r.status.toLowerCase();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.candidate_id}</td>
+                        <td>$${r.letter_base_salary?.toLocaleString() || 'N/A'}</td>
+                        <td>$${r.log_base_salary?.toLocaleString() || 'N/A'}</td>
+                        <td>$${r.letter_equity?.toLocaleString() || 'N/A'}</td>
+                        <td>$${r.log_equity?.toLocaleString() || 'N/A'}</td>
+                        <td>$${r.letter_signing_bonus?.toLocaleString() || 'N/A'}</td>
+                        <td>$${r.log_signing_bonus?.toLocaleString() || 'N/A'}</td>
+                        <td><span class="badge ${statusClass}">${r.status}</span></td>
+                        <td>${r.issues.join('; ') || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterReconTable() {
+            const statusFilter = document.getElementById('recon-status-filter').value;
+            
+            const data = DATA.offer_reconciliation.reconciliations.filter(r => {
+                return statusFilter === 'all' || r.status === statusFilter;
+            });
+            
+            renderReconTable(data);
+        }
+
+        function initAttrition(data) {
+            document.getElementById('attrition-total').textContent = data.summary.total_terminations;
+            document.getElementById('attrition-early').textContent = data.summary.total_early_attritions;
+            document.getElementById('attrition-rate').textContent = data.summary.overall_early_attrition_rate + '%';
+
+            // Department Chart
+            const deptChart = document.getElementById('attrition-dept-chart');
+            const maxDeptRate = Math.max(...data.department_summary.map(d => d.early_attrition_rate), 1);
+            
+            data.department_summary.forEach(d => {
+                const percentage = (d.early_attrition_rate / maxDeptRate) * 100;
+                deptChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${d.department}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill ${d.early_attrition_rate > 20 ? 'warning' : ''}" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${d.early_attrition_rate}% (${d.early_attritions}/${d.total_terminations})</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Manager Chart
+            const managerChart = document.getElementById('attrition-manager-chart');
+            const maxManagerRate = Math.max(...data.manager_summary.map(m => m.early_attrition_rate), 1);
+            
+            data.manager_summary.slice(0, 10).forEach(m => {
+                const percentage = (m.early_attrition_rate / maxManagerRate) * 100;
+                managerChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${m.manager}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill ${m.early_attrition_rate > 20 ? 'warning' : ''}" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${m.early_attrition_rate}% (${m.early_attritions}/${m.total_terminations})</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Populate department filter
+            const depts = [...new Set(data.terminations.map(e => e.department))];
+            const deptFilter = document.getElementById('attrition-dept-filter');
+            depts.forEach(dept => {
+                deptFilter.innerHTML += `<option value="${dept}">${dept}</option>`;
+            });
+
+            renderAttritionTable(data.terminations);
+        }
+
+        function renderAttritionTable(attritions) {
+            const tbody = document.getElementById('attrition-table-body');
+            tbody.innerHTML = '';
+            
+            attritions.forEach(a => {
+                const terminationType = a.termination_reason || 'Unknown';
+                const isEarly = a.is_early_attrition ? 'Yes' : 'No';
+                const earlyClass = a.is_early_attrition ? 'warning' : 'ok';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${a.employee_name}</td>
+                        <td>${a.department}</td>
+                        <td>${a.tenure_months}</td>
+                        <td>${terminationType}</td>
+                        <td><span class="badge ${earlyClass}">${isEarly}</span></td>
+                        <td>${a.manager}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterAttritionTable() {
+            const deptFilter = document.getElementById('attrition-dept-filter').value;
+            
+            const data = DATA.attrition.terminations.filter(a => {
+                return deptFilter === 'all' || a.department === deptFilter;
+            });
+            
+            renderAttritionTable(data);
+        }
+
+        // Assumptions Functions
+        function getAssumptions() {
+            return {
+                stage_targets: {
+                    'Applied': parseInt(document.getElementById('sla-applied').value),
+                    'Phone Screen': parseInt(document.getElementById('sla-phone-screen').value),
+                    'Technical/Assessment': parseInt(document.getElementById('sla-assessment').value),
+                    'Hiring Manager Interview': parseInt(document.getElementById('sla-hm-interview').value),
+                    'Final Round': parseInt(document.getElementById('sla-final-round').value),
+                    'Offer Extended': parseInt(document.getElementById('sla-offer-extended').value),
+                    'Offer Accepted': parseInt(document.getElementById('sla-offer-accepted').value)
+                },
+                risk_critical_condition: document.getElementById('risk-critical-condition').value,
+                risk_medium_threshold: parseInt(document.getElementById('risk-medium-threshold').value) / 100,
+                attrition_early_threshold: parseInt(document.getElementById('attrition-early-threshold').value),
+                attrition_high_rate: parseInt(document.getElementById('attrition-high-rate').value),
+                sla_warning_multiplier: parseFloat(document.getElementById('sla-warning-multiplier').value),
+                sla_critical_multiplier: parseFloat(document.getElementById('sla-critical-multiplier').value)
+            };
+        }
+
+        function applyAssumptions() {
+            const assumptions = getAssumptions();
+            
+            // Re-calculate pipeline health with new time targets
+            recalculatePipelineHealth(assumptions);
+            
+            // Re-calculate headcount gaps with new risk thresholds
+            recalculateHeadcountGaps(assumptions);
+            
+            // Re-calculate attrition with new threshold
+            recalculateAttrition(assumptions);
+            
+            // Update overview with new data
+            updateOverview();
+            
+            alert('Assumptions applied successfully!');
+        }
+
+        function resetAssumptions() {
+            document.getElementById('sla-applied').value = 3;
+            document.getElementById('sla-phone-screen').value = 7;
+            document.getElementById('sla-assessment').value = 10;
+            document.getElementById('sla-hm-interview').value = 10;
+            document.getElementById('sla-final-round').value = 14;
+            document.getElementById('sla-offer-extended').value = 5;
+            document.getElementById('sla-offer-accepted').value = 5;
+            document.getElementById('risk-critical-condition').value = 'high_no_pipeline';
+            document.getElementById('risk-medium-threshold').value = 50;
+            document.getElementById('attrition-early-threshold').value = 12;
+            document.getElementById('attrition-high-rate').value = 20;
+            document.getElementById('sla-warning-multiplier').value = 1.0;
+            document.getElementById('sla-critical-multiplier').value = 2.0;
+            
+            // Re-apply defaults
+            applyAssumptions();
+        }
+
+        function recalculatePipelineHealth(assumptions) {
+            const pipelineData = DATA.pipeline_health.candidates;
+            const stage_targets = assumptions.stage_targets;
+            const warning_multiplier = assumptions.sla_warning_multiplier;
+            const critical_multiplier = assumptions.sla_critical_multiplier;
+            
+            let warning_count = 0;
+            let critical_count = 0;
+            
+            pipelineData.forEach(c => {
+                const target = stage_targets[c.current_stage] || 7;
+                const warning_threshold = target * warning_multiplier;
+                const critical_threshold = target * critical_multiplier;
+                
+                if (c.days_in_stage > critical_threshold) {
+                    c.status = 'Critical';
+                    c.target = target;
+                    critical_count++;
+                } else if (c.days_in_stage > warning_threshold) {
+                    c.status = 'Warning';
+                    c.target = target;
+                    warning_count++;
+                } else {
+                    c.status = 'OK';
+                    c.target = target;
+                }
+            });
+            
+            DATA.pipeline_health.summary.warning_count = warning_count;
+            DATA.pipeline_health.summary.critical_count = critical_count;
+            
+            // Re-render pipeline health
+            initPipelineHealth(DATA.pipeline_health);
+        }
+
+        function recalculateHeadcountGaps(assumptions) {
+            const gaps = DATA.headcount_gaps.gaps;
+            const critical_condition = assumptions.risk_critical_condition;
+            const medium_threshold = assumptions.risk_medium_threshold;
+            
+            let critical_risks = [];
+            
+            gaps.forEach(g => {
+                let risk = 'Low';
+                
+                if (critical_condition === 'high_no_pipeline' && g.open_seats > 0 && g.active_pipeline == 0 && g.priority === 'High') {
+                    risk = 'Critical';
+                    critical_risks.push({
+                        department: g.department,
+                        level: g.level,
+                        open_seats: g.open_seats,
+                        priority: g.priority
+                    });
+                } else if (critical_condition === 'any_no_pipeline' && g.open_seats > 0 && g.active_pipeline == 0) {
+                    risk = 'Critical';
+                    critical_risks.push({
+                        department: g.department,
+                        level: g.level,
+                        open_seats: g.open_seats,
+                        priority: g.priority
+                    });
+                } else if (critical_condition === 'low_pipeline' && g.open_seats > 0 && g.active_pipeline < g.open_seats * medium_threshold) {
+                    risk = 'Critical';
+                    critical_risks.push({
+                        department: g.department,
+                        level: g.level,
+                        open_seats: g.open_seats,
+                        priority: g.priority
+                    });
+                } else if (g.open_seats > 0 && g.active_pipeline == 0) {
+                    risk = 'Medium';
+                } else if (g.open_seats > 0 && g.active_pipeline < g.open_seats * medium_threshold) {
+                    risk = 'Medium';
+                }
+                
+                g.risk = risk;
+            });
+            
+            DATA.headcount_gaps.critical_risks = critical_risks;
+            DATA.headcount_gaps.summary.critical_risk_count = critical_risks.length;
+            
+            // Re-render headcount gaps
+            initHeadcountGaps(DATA.headcount_gaps);
+        }
+
+        function recalculateAttrition(assumptions) {
+            const early_threshold = assumptions.attrition_early_threshold;
+            const high_rate = assumptions.attrition_high_rate;
+            
+            const terminations = DATA.attrition.terminations;
+            const early_attritions = [];
+            
+            terminations.forEach(t => {
+                const is_early = t.tenure_months < early_threshold;
+                t.is_early_attrition = is_early;
+                
+                if (is_early) {
+                    early_attritions.push(t);
+                }
+            });
+            
+            DATA.attrition.early_attritions = early_attritions;
+            DATA.attrition.summary.total_early_attritions = early_attritions.length;
+            const overall_rate = terminations.length > 0 ? (early_attritions.length / terminations.length * 100) : 0;
+            DATA.attrition.summary.overall_early_attrition_rate = round(overall_rate, 1);
+            
+            // Re-calculate department summary
+            const dept_attrition = {};
+            terminations.forEach(t => {
+                if (!dept_attrition[t.department]) {
+                    dept_attrition[t.department] = { total: 0, early: 0 };
+                }
+                dept_attrition[t.department].total++;
+                if (t.is_early_attrition) {
+                    dept_attrition[t.department].early++;
+                }
+            });
+            
+            const dept_summary = [];
+            Object.entries(dept_attrition).forEach(([dept, counts]) => {
+                const early_rate = counts.total > 0 ? (counts.early / counts.total * 100) : 0;
+                dept_summary.push({
+                    department: dept,
+                    total_terminations: counts.total,
+                    early_attritions: counts.early,
+                    early_attrition_rate: round(early_rate, 1)
+                });
+            });
+            
+            DATA.attrition.department_summary = dept_summary;
+            
+            // Re-calculate manager summary
+            const manager_attrition = {};
+            terminations.forEach(t => {
+                if (!manager_attrition[t.manager]) {
+                    manager_attrition[t.manager] = { total: 0, early: 0 };
+                }
+                manager_attrition[t.manager].total++;
+                if (t.is_early_attrition) {
+                    manager_attrition[t.manager].early++;
+                }
+            });
+            
+            const manager_summary = [];
+            Object.entries(manager_attrition).forEach(([manager, counts]) => {
+                const early_rate = counts.total > 0 ? (counts.early / counts.total * 100) : 0;
+                manager_summary.push({
+                    manager: manager,
+                    total_terminations: counts.total,
+                    early_attritions: counts.early,
+                    early_attrition_rate: round(early_rate, 1)
+                });
+            });
+            
+            DATA.attrition.manager_summary = manager_summary;
+            
+            // Re-render attrition
+            initAttrition(DATA.attrition);
+            renderAttritionTable(DATA.attrition.terminations);
+        }
+
+        function updateOverview() {
+            const pipelineData = DATA.pipeline_health;
+            const headcountData = DATA.headcount_gaps;
+            const funnelData = DATA.offer_funnel;
+            const attritionData = DATA.attrition;
+
+            document.getElementById('overview-active-candidates').textContent = pipelineData.summary.total_candidates;
+            document.getElementById('overview-sla-breaches').textContent = pipelineData.summary.warning_count + pipelineData.summary.critical_count;
+            document.getElementById('overview-open-seats').textContent = headcountData.summary.total_open_seats;
+            document.getElementById('overview-critical-risks').textContent = headcountData.summary.critical_risk_count;
+            document.getElementById('overview-acceptance-rate').textContent = funnelData.offer_metrics.acceptance_rate + '%';
+            document.getElementById('overview-attrition-rate').textContent = attritionData.summary.overall_early_attrition_rate + '%';
+        }
+
+        function round(value, decimals) {
+            return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+        }
+
+        function showCriticalRisks() {
+            showPage('headcount-gaps');
+            // Set filter to Critical after page transition
+            setTimeout(() => {
+                document.getElementById('headcount-risk-filter').value = 'Critical';
+                filterHeadcountTable();
+            }, 100);
+        }
+
+        function initTimeToFill(data) {
+            const summary = data.summary;
+            
+            document.getElementById('ttf-total-hired').textContent = summary.total_hired;
+            document.getElementById('ttf-avg').textContent = summary.avg_time_to_fill;
+            document.getElementById('ttf-median').textContent = summary.median_time_to_fill;
+            document.getElementById('ttf-min').textContent = summary.min_time_to_fill;
+            document.getElementById('ttf-max').textContent = summary.max_time_to_fill;
+
+            // Department chart
+            const deptChart = document.getElementById('ttf-dept-chart');
+            const maxDeptTtf = Math.max(...data.by_department.map(d => d.avg_time_to_fill), 1);
+            
+            data.by_department.forEach(d => {
+                const percentage = (d.avg_time_to_fill / maxDeptTtf) * 100;
+                deptChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${d.department}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${d.avg_time_to_fill}d</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Level chart
+            const levelChart = document.getElementById('ttf-level-chart');
+            const maxLevelTtf = Math.max(...data.by_level.map(l => l.avg_time_to_fill), 1);
+            
+            data.by_level.forEach(l => {
+                const percentage = (l.avg_time_to_fill / maxLevelTtf) * 100;
+                levelChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${l.level}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${l.avg_time_to_fill}d</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Hiring manager table
+            const hmTable = document.getElementById('ttf-hm-table-body');
+            data.by_hiring_manager.forEach(hm => {
+                hmTable.innerHTML += `
+                    <tr>
+                        <td>${hm.hiring_manager}</td>
+                        <td>${hm.count}</td>
+                        <td>${hm.avg_time_to_fill}</td>
+                        <td>${hm.median_time_to_fill}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function initCostAnalytics(data) {
+            const summary = data.summary;
+            
+            document.getElementById('cost-total-budget').textContent = '$' + (summary.total_budget / 1000000).toFixed(1) + 'M';
+            document.getElementById('cost-actual').textContent = '$' + (summary.total_actual_cost / 1000000).toFixed(1) + 'M';
+            document.getElementById('cost-per-hire').textContent = '$' + summary.overall_cost_per_hire.toLocaleString();
+            document.getElementById('cost-utilization').textContent = summary.overall_budget_utilization + '%';
+            document.getElementById('cost-attrition').textContent = '$' + (summary.total_attrition_cost / 1000000).toFixed(1) + 'M';
+            document.getElementById('cost-early-attrition').textContent = '$' + (summary.early_attrition_cost / 1000000).toFixed(1) + 'M';
+
+            // Cost per hire chart
+            const costChart = document.getElementById('cost-dept-chart');
+            const maxCost = Math.max(...data.cost_per_hire.map(c => c.cost_per_hire), 1);
+            
+            data.cost_per_hire.forEach(c => {
+                const percentage = (c.cost_per_hire / maxCost) * 100;
+                costChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${c.department}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">$${(c.cost_per_hire / 1000000).toFixed(1)}M</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Attrition cost chart
+            const attritionChart = document.getElementById('cost-attrition-chart');
+            const maxAttritionCost = Math.max(...data.attrition_by_department.map(a => a.total_attrition_cost), 1);
+            
+            data.attrition_by_department.forEach(a => {
+                const percentage = (a.total_attrition_cost / maxAttritionCost) * 100;
+                attritionChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${a.department}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill critical" style="width: ${percentage}%"></div>
+                            <div class="bar-value">$${(a.total_attrition_cost / 1000000).toFixed(1)}M</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Cost table
+            const costTable = document.getElementById('cost-table-body');
+            data.cost_per_hire.forEach(c => {
+                const utilizationClass = c.budget_utilization > 100 ? 'critical' : (c.budget_utilization > 90 ? 'warning' : 'ok');
+                costTable.innerHTML += `
+                    <tr>
+                        <td>${c.department}</td>
+                        <td>${c.hires}</td>
+                        <td>$${(c.annual_budget / 1000000).toFixed(1)}M</td>
+                        <td>$${(c.actual_cost / 1000000).toFixed(1)}M</td>
+                        <td>$${c.cost_per_hire.toLocaleString()}</td>
+                        <td><span class="badge ${utilizationClass}">${c.budget_utilization}%</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function initOfferAnalysis(data) {
+            const summary = data.summary;
+            
+            document.getElementById('offer-total').textContent = summary.total_offers;
+            document.getElementById('offer-declined').textContent = summary.total_declined;
+            document.getElementById('offer-decline-rate').textContent = summary.decline_rate + '%';
+            document.getElementById('offer-competing').textContent = summary.competing_offer_decline_rate + '%';
+
+            // Decline reasons chart
+            const reasonsChart = document.getElementById('offer-reasons-chart');
+            const maxReasonCount = Math.max(...data.decline_reasons.map(r => r.count), 1);
+            
+            data.decline_reasons.forEach(r => {
+                const percentage = (r.count / maxReasonCount) * 100;
+                reasonsChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${r.reason}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill warning" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${r.count} (${r.percentage}%)</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Roles chart (using declined offers data)
+            const rolesChart = document.getElementById('offer-roles-chart');
+            const roleCounts = {};
+            data.declined_offers.forEach(o => {
+                if (!roleCounts[o.role]) roleCounts[o.role] = 0;
+                roleCounts[o.role]++;
+            });
+            
+            const maxRoleCount = Math.max(...Object.values(roleCounts), 1);
+            Object.entries(roleCounts).slice(0, 8).forEach(([role, count]) => {
+                const percentage = (count / maxRoleCount) * 100;
+                rolesChart.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">${role}</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%"></div>
+                            <div class="bar-value">${count}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Declined offers table
+            const declineTable = document.getElementById('offer-decline-table-body');
+            data.declined_offers.forEach(o => {
+                const compGapClass = o.comp_gap < 0 ? 'critical' : (o.comp_gap > 0 ? 'ok' : '');
+                declineTable.innerHTML += `
+                    <tr>
+                        <td>${o.candidate_name}</td>
+                        <td>${o.role}</td>
+                        <td>${o.department}</td>
+                        <td>$${o.offered_salary.toLocaleString()}</td>
+                        <td>$${o.avg_accepted_salary.toLocaleString()}</td>
+                        <td><span class="badge ${compGapClass}">${o.comp_gap > 0 ? '+' : ''}$${o.comp_gap.toLocaleString()}</span></td>
+                        <td>${o.decline_reason || 'Unknown'}</td>
+                        <td>${o.competing_offer ? 'Yes' : 'No'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (DATA) {
+                initDashboard(DATA);
+            }
+        });
+    </script>
+</body>
+</html>
