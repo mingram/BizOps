@@ -31,6 +31,7 @@ def main():
     
     # Write to dist/index.html
     dist_dir = os.path.join(os.path.dirname(__file__), 'dist')
+    os.makedirs(dist_dir, exist_ok=True)
     output_path = os.path.join(dist_dir, 'index.html')
     
     with open(output_path, 'w', encoding='utf-8') as f:
