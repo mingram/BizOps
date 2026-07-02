@@ -23,5 +23,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Build output
-dist/
+# Build output (ship the generated dashboard, ignore other build artifacts)
+dist/*
+!dist/index.html
