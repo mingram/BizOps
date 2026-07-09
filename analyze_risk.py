@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 import csv
+import os
 from collections import defaultdict
 
+# Define data paths relative to this script
+base_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(base_dir, 'data')
+
 # Load headcount plan
-with open('c:/Users/Max/Downloads/Cognition Case/data/headcount_plan.csv', 'r') as f:
+with open(os.path.join(data_dir, 'headcount_plan.csv'), 'r', encoding='utf-8') as f:
     headcount = list(csv.DictReader(f))
 
 # Load pipeline
-with open('c:/Users/Max/Downloads/Cognition Case/data/recruiting_pipeline.csv', 'r') as f:
+with open(os.path.join(data_dir, 'recruiting_pipeline.csv'), 'r', encoding='utf-8') as f:
     pipeline = list(csv.DictReader(f))
 
 # Count active pipeline by (department, level)
